@@ -1,4 +1,4 @@
-#include "../include/OutputCapturer.h"
+#include "OutputCapturer.h"
 
 std::ostringstream OutputCapturer::stream;
 boost::mutex OutputCapturer::mMutex;
