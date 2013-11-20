@@ -35,6 +35,8 @@ set(JGE_SOURCES
         src/pc/JGfx.cpp
         src/qt/filedownloader.cpp
         src/qt/corewrapper.cpp
+        include/qt/corewrapper.h #so automoc finds it
+        include/qt/filedownloader.h
         src/Qtmain.cpp)
 
 #turn automoc for filedownloader on

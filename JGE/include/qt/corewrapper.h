@@ -6,6 +6,10 @@
 #ifndef QT_WIDGET
 #include <QtDeclarative>
 #include <QGraphicsItem>
+#else
+#include <QGLWidget>
+#include <QTapAndHoldGesture>
+#include <QGestureEvent>
 #endif //QT_WIDGET
 #include "../include/JGE.h"
 #include "../include/JTypes.h"
