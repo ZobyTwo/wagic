@@ -29,22 +29,33 @@ set(JGE_SOURCES
         src/hge/hgevector.cpp
         src/zipFS/zfsystem.cpp
         src/zipFS/ziphdr.cpp
-        src/zipFS/zstream.cpp
-#if
-        src/JMD2Model.cpp
-        src/pc/JGfx.cpp
-        src/qt/filedownloader.cpp
-        src/qt/corewrapper.cpp
-        include/qt/corewrapper.h #so automoc finds it
-        include/qt/filedownloader.h
-        src/Qtmain.cpp)
+        src/zipFS/zstream.cpp)
 
-#turn automoc for filedownloader on
+set(JGE_graphics_src
+        src/JMD2Model.cpp
+        src/pc/JGfx.cpp)
+        
+set(JGE_console_src
+        src/JGfx-fake.cpp)
+
+if(platform_qt_console)
+    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_console_src})
+endif()
+
+if(platform_qt_widget)
+    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_graphics_src})
+endif()
+
+
+#turn automoc for filedownloader and corewrapper on
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC TRUE)
-add_definitions(-DLINUX -DQT_WIDGET -DUSERDIR=".wagic") #dirty hacks
 
-add_library(jge ${JGE_SOURCES})
+add_definitions(-DLINUX -DUSERDIR=".wagic") #dirty hacks
+
+#project options
+
+add_library(jge ${JGE_SOURCES} ${JGE_console_src})
 
 include_directories(include)
 include_directories(include/qt) #corewrapper & filedownloader
@@ -54,12 +65,11 @@ include_directories(../projects/mtg/include) #precompiled header
 
 #3rd party stuff
 find_package(TinyXML REQUIRED)
-find_package(Qt4 REQUIRED QtCore QtGui QtOpenGL QtNetwork QtDeclarative)
-include(${QT_USE_FILE})
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(GIF REQUIRED)
+find_package(GLUT REQUIRED)
 
 include_directories(${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-target_link_libraries(jge ${QT_LIBRARIES} GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+target_link_libraries(jge GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
