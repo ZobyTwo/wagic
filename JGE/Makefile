@@ -74,7 +74,7 @@ PSPSDK = $(shell psp-config --pspsdk-path)
 PSPDIR = $(shell psp-config --psp-prefix)
 OBJS = $(GENERIC_OBJS) $(PSP_OBJS)
 TARGET_HGE = libhgetools.a
-INCDIR = include/psp include/psp/freetype2 ../Boost src/zipFS
+INCDIR = include/psp include/psp/freetype2 ../Boost src/zipFS src/tinyxml include/
 CXXFLAGS += -O2 -G0 -DPSP
 LIBDIR = lib/psp
 endif
