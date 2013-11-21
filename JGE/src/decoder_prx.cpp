@@ -19,9 +19,10 @@
  *
  */
  
-#include "../include/decoder_prx.h"
+#include "decoder_prx.h"
+#include <psputility.h>
  
-char *prx_static_init()
+const char *prx_static_init()
 	{
 	int result;
 #ifdef DEVHOOK
