@@ -124,21 +124,30 @@ set(wagic_qt_console_src
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC TRUE)
 
-add_definitions(-DLINUX -DUSERDIR=".wagic") #dirty hacks
-
 #build the graphical module
 if( platform_qt_widget)
     add_definitions(-DQT_WIDGET)
     set(SOURCES "${SOURCES}" ${wagic_qt_graphic_src})
     set(Qt_required_modules QtCore QtGui QtOpenGL QtNetwork)
+    add_definitions(-DQT_CONFIG)
+    add_definitions(-DUSERDIR=".wagic")
 endif()
 
 #or build the console module
 if( platform_qt_console)
-    message("build with qt-console")
     add_definitions(-DCONSOLE_CONFIG -DTESTSUITE)
     set(SOURCES "${SOURCES}" ${wagic_qt_console_src})
     set(Qt_required_modules QtCore QtNetwork)
+    add_definitions(-DQT_CONFIG)
+    add_definitions(-DUSERDIR=".wagic")
+endif()
+
+if(operating_system_windows)
+    add_definitions(-DWIN32)
+endif()
+
+if(operating_system_linux)
+    add_definitions(-DLINUX)
 endif()
 
 add_executable(wagic ${SOURCES})

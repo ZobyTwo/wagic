@@ -31,10 +31,6 @@ set(JGE_hge_src
         src/hge/hgerect.cpp
         src/hge/hgevector.cpp)
         
-set(JGE_linux_src
-        src/pc/JSocket.cpp
-        src/pc/JSfx.cpp)
-        
 set(JGE_graphics_src
         src/JMD2Model.cpp
         src/pc/JGfx.cpp)
@@ -42,6 +38,10 @@ set(JGE_graphics_src
 set(JGE_console_src
         src/JGfx-fake.cpp)
 
+set(JGE_linux_src
+        src/pc/JSocket.cpp
+        src/pc/JSfx.cpp)
+        
 set(JGE_psp_src
         src/JSocket.cpp 
         src/JGfx.cpp
@@ -52,26 +52,38 @@ set(JGE_psp_src
         src/main.cpp
         src/vram.cpp)
 
-if(platform_qt_console)
-    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_console_src}  ${JGE_linux_src} ${JGE_hge_src})
+if(platform_qt_widget)
+    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_graphics_src})
+    add_definitions(-DQT_CONFIG)
+    add_definitions(-DUSERDIR=".wagic")
+    set(Qt_required_modules QtOpenGL QtCore)
 endif()
 
-if(platform_qt_widget)
-    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+if(platform_qt_console)
+    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_console_src})
+    add_definitions(-DQT_CONFIG)
+    add_definitions(-DUSERDIR=".wagic")
+    set(Qt_required_modules QtOpenGL QtCore)
+endif()
+
+if(operating_system_windows)
+    add_definitions(-DWIN32)
+endif()
+
+if(operating_system_linux)
+    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_linux_src} ${JGE_hge_src})
+    add_definitions(-DLINUX)
 endif()
 
 #turn automoc for filedownloader and corewrapper on
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC TRUE)
 
-add_definitions(-DLINUX -DUSERDIR=".wagic") #dirty hacks
 
 #project options
-
 add_library(jge ${JGE_SOURCES} ${JGE_console_src})
 
 include_directories(include)
-include_directories(include/qt) #corewrapper & filedownloader
 include_directories(src/zipFS) #zipFS
 include_directories(../projects/mtg/qml/qmlapplicationviewer) #Qtmain
 include_directories(../projects/mtg/include) #precompiled header
@@ -83,6 +95,8 @@ find_package(JPEG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(GIF REQUIRED)
 find_package(GLUT REQUIRED)
+find_package(Qt4 REQUIRED ${Qt_required_modules})
+include(${QT_USE_FILE})
 
 include_directories(${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-target_link_libraries(jge GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+target_link_libraries(jge ${QT_LIBRARIES} GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
