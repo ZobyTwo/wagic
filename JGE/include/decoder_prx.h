@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-char *prx_static_init();
+const char *prx_static_init();
 
 #ifdef __cplusplus
 }
