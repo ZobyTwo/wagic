@@ -42,11 +42,15 @@ CONFIG(graphics, graphics|console){
         ../../JGE/include/qt/corewrapper.h
 
     SOURCES += \
-        ../../JGE/src/qt/filedownloader.cpp\
-        ../../JGE/src/qt/corewrapper.cpp\
-        ../../JGE/src/Qtmain.cpp\
+        src/qt/filedownloader.cpp\
+        src/qt/corewrapper.cpp\
+        src/Qtmain.cpp\
         ../../JGE/src/JMD2Model.cpp\
         ../../JGE/src/pc/JGfx.cpp
+
+    HEADERS += \
+        include/qt/filedownloader.h\
+        include/qt/corewrapper.h
 }
 else:CONFIG(console, graphics|console){
     HEADERS += \
@@ -55,7 +59,7 @@ else:CONFIG(console, graphics|console){
     SOURCES += \
         ../../JGE/src/OutputCapturer.cpp\
         ../../JGE/src/JGfx-fake.cpp\
-        ../../JGE/src/Qtconsole.cpp\
+        src/Qtconsole.cpp
 }
 
 # maemo 5 packaging

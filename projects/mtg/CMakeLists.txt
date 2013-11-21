@@ -128,10 +128,9 @@ add_definitions(-DLINUX -DUSERDIR=".wagic") #dirty hacks
 
 #build the graphical module
 if( platform_qt_widget)
-    message("build with qt-widget")
     add_definitions(-DQT_WIDGET)
     set(SOURCES "${SOURCES}" ${wagic_qt_graphic_src})
-    set(Qt_required_modules QtCore QtGui QtOpenGL QtNetwork QtDeclarative)
+    set(Qt_required_modules QtCore QtGui QtOpenGL QtNetwork)
 endif()
 
 #or build the console module
@@ -139,7 +138,7 @@ if( platform_qt_console)
     message("build with qt-console")
     add_definitions(-DCONSOLE_CONFIG -DTESTSUITE)
     set(SOURCES "${SOURCES}" ${wagic_qt_console_src})
-    set(Qt_required_modules QtCore QtOpenGL)
+    set(Qt_required_modules QtCore QtNetwork)
 endif()
 
 add_executable(wagic ${SOURCES})
@@ -159,7 +158,6 @@ find_package(TinyXML REQUIRED)
 find_package(Qt4 REQUIRED QtCore QtGui QtOpenGL QtNetwork QtDeclarative)
 find_package(X11 REQUIRED)
 find_package(Qt4 REQUIRED ${Qt_required_modules})
-include(${QT_USE_FILE})
 
 include(${QT_USE_FILE})
 include_directories(${Boost_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
