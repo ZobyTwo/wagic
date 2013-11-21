@@ -74,8 +74,9 @@ static int __largest_update = 0;
 static int __largest_block = __MEM_BLOCKS;
 static int __mem_free = __MEM_BLOCKS;
 
-
-inline void* vrelptr( void *ptr )
+//FIXME: JGfx.cpp::JRenderer uses this. it can therefore not be inline as long as we build jge as a lib
+//inline
+void* vrelptr( void *ptr )
 {
         return (void*)((unsigned int)ptr & ~__MEM_START);
 }
