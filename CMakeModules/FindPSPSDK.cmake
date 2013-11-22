@@ -9,15 +9,29 @@
 #  PSPSDK_PREFIX - The output of psp-config --psp-prefix
 #  PSPSDK_CXX_COMPILER - The PSPSDK CXX Compilers path
 #  PSPSDK_CXX_LINKER - The PSPSDK CXX Linker command
+#  PSPSDK_FIXUP_IMPORTS_COMMAND - psp-fixup-imports command
+#  PSPSDK_PRXGEN_COMMAND - psp-prxgen command
+#  PSPSDK_PACK_PBP_COMMAND - pack-pbp command
+#  PSPSDK_MKSFO_COMMAND - mksfo command
 
 #find the psp-config progams absolute path
 #psp-config needs to be reachable via the system shell (PATH)
 find_program(PSP_CONFIG_PROGRAM psp-config)
 
 #TODO: check if something is REQUIRED and throw errors instead of messages
+    
+    add_custom_command(TARGET wagic POST_BUILD
+        COMMAND ${PSPSDK_FIXUP_IMPORTS_COMMAND} ARGS wagic
+        COMMAND ${PSPSDK_PRXGEN_COMMAND} ARGS wagic wagic.prx
+        COMMAND ${PSPSDK_PACK_PBP_COMMAND} ARGS EBOOT.PBP PARAM.SFO icon.png NULL pic0.png pic1.png NULL wagic.prx NULL)
+        
 if(PSP_CONFIG_PROGRAM)
     find_program(PSPSDK_CXX_COMPILER psp-g++)
     find_program(PSPSDK_CXX_LINKER psp-gcc)
+    find_program(PSPSDK_FIXUP_IMPORTS_COMMAND psp-fixup-imports)
+    find_program(PSPSDK_PRXGEN_COMMAND psp-prxgen)
+    find_program(PSPSDK_PACK_PBP_COMMAND pack-pbp)
+    find_program(PSPSDK_MKSFO_COMMAND mksfo)
     
     #ask psp-config for the 
     execute_process(COMMAND psp-config --pspsdk-path OUTPUT_VARIABLE PSPSDK_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)

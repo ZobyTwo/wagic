@@ -178,6 +178,7 @@ if(platform_sdl)
     if(operating_system_linux)
         add_definitions(-DLINUX)
     endif()
+    
 endif()
 
 if(operating_system_windows)

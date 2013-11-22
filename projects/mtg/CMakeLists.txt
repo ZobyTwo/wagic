@@ -223,7 +223,21 @@ if( platform_psp)
     add_definitions(-G0 -DPSP -D_PSP_FW_VERSION=371)
     
     #Note: I tried to preserve the same link-order as in the original makefile
-    target_link_libraries(wagic jge ${HGETOOLS_LIB} ${FREETYPE_LIB} ${PSP_JPEG_LIB} ${PSP_GIF_LIB} ${PSP_PNG_LIB} z m ${PSP_MIKMOD} ${PSPSDK_LIB} stdc++ ${PSPSDK_REQUIRED_LIB})    
+    target_link_libraries(wagic jge ${HGETOOLS_LIB} ${FREETYPE_LIB} ${PSP_JPEG_LIB} ${PSP_GIF_LIB} ${PSP_PNG_LIB} z m ${PSP_MIKMOD} ${PSPSDK_LIB} stdc++ ${PSPSDK_REQUIRED_LIB})
+    
+    set(PRXSPECS_FILE "${PSPSDK_PATH}/lib/prxspecs")
+    set(LINKFILE_FILE "${PSPSDK_PATH}/lib/linkfile.prx")
+    
+    get_property(wagic_elf_location TARGET wagic PROPERTY LOCATION)
+    get_filename_component(wagic_elf_directory ${wagic_elf_location} PATH)
+    
+    # ${PSPSDK_PATH}/lib/prxexports.o
+    set_target_properties(wagic PROPERTIES LINK_FLAGS "-specs=${PRXSPECS_FILE} -Wl,-q,-T${LINKFILE_FILE}")
+    add_custom_command(TARGET wagic POST_BUILD
+        COMMAND ${PSPSDK_MKSFO_COMMAND} ARGS "'Wagic, the Homebrew?!'" "${wagic_elf_directory}/PARAM.SFO"
+        COMMAND ${PSPSDK_FIXUP_IMPORTS_COMMAND} ARGS ${wagic_elf_location}
+        COMMAND ${PSPSDK_PRXGEN_COMMAND} ARGS ${wagic_elf_location} "${wagic_elf_directory}/wagic.prx"
+        COMMAND ${PSPSDK_PACK_PBP_COMMAND} ARGS ${wagic_elf_directory}/EBOOT.PBP ${wagic_elf_directory}/PARAM.SFO ${CMAKE_CURRENT_SOURCE_DIR}/icon.png NULL ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png NULL "${wagic_elf_directory}/wagic.prx" NULL)
 endif()
 
 if(platform_sdl)
@@ -239,7 +253,6 @@ if(platform_sdl)
     #sdl 1
     #find_package(SDL REQUIRED)
     #include_directories(${SDL_INCLUDE_DIR})
-    
     
     include_directories(${BOOST_INCLUDE_DIRS})
     add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src})
