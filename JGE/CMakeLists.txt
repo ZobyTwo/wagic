@@ -1,5 +1,5 @@
 #the sources, jge will need always
-set(JGE_generic_ssrc
+set(JGE_generic_src
         src/Encoding.cpp 
         src/JAnimator.cpp
         src/JApp.cpp
@@ -107,7 +107,7 @@ endif()
 
 if(platform_qt_widget)
     if(operating_system_linux)
-        add_library(jge ${JGE_generic_ssrc} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+        add_library(jge ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
         add_definitions(-DLINUX)
     endif()
 
@@ -120,7 +120,7 @@ endif()
 
 if(platform_qt_console)    
     if(operating_system_linux)
-        add_library(jge ${JGE_generic_ssrc} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
+        add_library(jge ${JGE_generic_src} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
         add_definitions(-DLINUX)
     endif()
     
@@ -136,7 +136,7 @@ if(platform_psp)
     find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
     set(CMAKE_CXX_COMPILER ${PSPSDK_CXX_COMPILER})
     
-    add_library(jge ${JGE_generic_ssrc} ${JGE_psp_src} ${JGE_hge_src} ${JGE_TinyXML_src})
+    add_library(jge ${JGE_generic_src} ${JGE_psp_src} ${JGE_hge_src} ${JGE_TinyXML_src})
     
     #use the local headers.
     #TODO: Check if that is realy necessary in every case
@@ -154,6 +154,30 @@ if(platform_psp)
     
     #TODO: check if we can link pspsdk right here 
     #target_link_libraries(jge)
+endif()
+
+if(platform_sdl)
+    add_library(jge ${JGE_generic_src} ${JGE_hge_src} ${JGE_linux_src})
+    
+    set(Boost_USE_STATIC_LIBS OFF) 
+    set(Boost_USE_MULTITHREADED ON)  
+    set(Boost_USE_STATIC_RUNTIME OFF)
+    find_package(Boost COMPONENTS system thread REQUIRED)
+    
+    #sdl 2
+    find_package(SDL2 REQUIRED)
+    include_directories(${SDL2_INCLUDE_DIR})
+    #sdl 1
+    #find_package(SDL REQUIRED)
+    #include_directories(${SDL_INCLUDE_DIR})
+    
+    include_directories(${BOOST_INCLUDE_DIRS})
+    include_directories(../projects/mtg/include) #precompiled header
+    add_definitions(-DSDL_CONFIG)
+    
+    if(operating_system_linux)
+        add_definitions(-DLINUX)
+    endif()
 endif()
 
 if(operating_system_windows)

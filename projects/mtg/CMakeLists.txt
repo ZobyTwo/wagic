@@ -122,8 +122,11 @@ set(MTG_qt_graphic_src
         src/Qtmain.cpp)
 
 #the sources we need to compile the testsuit
-set(wagic_qt_console_src
+set(MTG_qt_console_src
         src/Qtconsole.cpp)
+        
+set(MTG_sdl_src
+        src/SDLmain.cpp)
 
 #common settings for all platforms
 include_directories(include)
@@ -159,7 +162,7 @@ if( platform_qt_widget)
 
     include_directories(include/qt)
     include_directories(${QT_MKSPECS_DIR}/default)
-    add_executable(wagic ${MTG_generic_src}  ${wagic_qt_graphic_src})
+    add_executable(wagic ${MTG_generic_src}  ${MTG_qt_graphic_src})
     
     target_link_libraries(wagic jge ${QT_LIBRARIES} GL GLU glut ${X11_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
 endif()
@@ -176,7 +179,7 @@ if( platform_qt_console)
     
     include_directories(include/qt)
     include_directories(${QT_MKSPECS_DIR}/default)
-    add_executable(wagic ${MTG_generic_src} ${wagic_qt_console_src})
+    add_executable(wagic ${MTG_generic_src} ${MTG_qt_console_src})
     
     target_link_libraries(wagic jge ${QT_LIBRARIES} GL GLU glut ${X11_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
 endif()
@@ -222,3 +225,24 @@ if( platform_psp)
     #Note: I tried to preserve the same link-order as in the original makefile
     target_link_libraries(wagic jge ${HGETOOLS_LIB} ${FREETYPE_LIB} ${PSP_JPEG_LIB} ${PSP_GIF_LIB} ${PSP_PNG_LIB} z m ${PSP_MIKMOD} ${PSPSDK_LIB} stdc++ ${PSPSDK_REQUIRED_LIB})    
 endif()
+
+if(platform_sdl)
+    if(operating_system_linux)
+        add_definitions(-DLINUX)
+    endif()
+
+    add_definitions(-DSDL_CONFIG)
+    
+    #sdl 2
+    find_package(SDL2 REQUIRED)
+    include_directories(${SDL2_INCLUDE_DIR})
+    #sdl 1
+    #find_package(SDL REQUIRED)
+    #include_directories(${SDL_INCLUDE_DIR})
+    
+    
+    include_directories(${BOOST_INCLUDE_DIRS})
+    add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src})
+    target_link_libraries(wagic jge ${SDL2_LIBRARIES} GL GLU glut ${X11_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
+endif()
+
