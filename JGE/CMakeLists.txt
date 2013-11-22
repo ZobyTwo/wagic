@@ -1,4 +1,5 @@
-set(JGE_SOURCES
+#the sources, jge will need always
+set(JGE_generic_ssrc
         src/Encoding.cpp 
         src/JAnimator.cpp
         src/JApp.cpp
@@ -22,7 +23,9 @@ set(JGE_SOURCES
         src/zipFS/zfsystem.cpp
         src/zipFS/ziphdr.cpp
         src/zipFS/zstream.cpp)
-        
+
+#the sources we need to compile libhge
+#NOTE: we do not build an extra lib but compile it directly into jge
 set(JGE_hge_src
         src/hge/hgecolor.cpp
         src/hge/hgedistort.cpp
@@ -30,18 +33,27 @@ set(JGE_hge_src
         src/hge/hgeparticle.cpp
         src/hge/hgerect.cpp
         src/hge/hgevector.cpp)
-        
+
+#the sources we need to get graphical output desktops
+#used by qt-widget build option
 set(JGE_graphics_src
         src/JMD2Model.cpp
         src/pc/JGfx.cpp)
-        
+
+#the sources we need to fake graphical output on desktops
+#these are used for the console-only testsuit
 set(JGE_console_src
         src/JGfx-fake.cpp)
 
+#the sources we need on linux
 set(JGE_linux_src
         src/pc/JSocket.cpp
         src/pc/JSfx.cpp)
-        
+
+#the sources we need if we compile for psp
+#note: main.cpp contains the main-function.
+#the other main functions reside in projects/mtg to reduce cross-library dependencies.
+#there may be a way to get all main-functions into the same project
 set(JGE_psp_src
         src/JSocket.cpp 
         src/JGfx.cpp
@@ -51,52 +63,102 @@ set(JGE_psp_src
         src/decoder_prx.cpp
         src/main.cpp
         src/vram.cpp)
+        
+#these sources are needed if we want to cross-compile tinyxml
+set(JGE_TinyXML_src
+        src/tinyxml/tinystr.cpp
+        src/tinyxml/tinyxmlerror.cpp
+        src/tinyxml/tinyxmlparser.cpp
+        src/tinyxml/tinyxml.cpp)
+        
+#get common settings for all platforms done:
+include_directories(include)
+include_directories(src/zipFS)
 
-if(platform_qt_widget)
-    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_graphics_src})
+
+#get common settings for all qt-builds done:
+if(platform_qt)
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+    set(CMAKE_AUTOMOC TRUE)
+    
+    find_package(Qt4 COMPONENTS QtOpenGL QtCore REQUIRED)
+    include(${QT_USE_FILE})
+    
+    #take the systems libs
+    find_package(TinyXML REQUIRED)
+    find_package(PNG REQUIRED)
+    find_package(JPEG REQUIRED)
+    find_package(ZLIB REQUIRED)
+    find_package(GIF REQUIRED)
+    find_package(GLUT REQUIRED)
+    set(Boost_USE_STATIC_LIBS OFF) 
+    set(Boost_USE_MULTITHREADED ON)  
+    set(Boost_USE_STATIC_RUNTIME OFF)
+    find_package(Boost COMPONENTS system thread REQUIRED)
+    
     add_definitions(-DQT_CONFIG)
+    #there may be better ways to get those dirs
+    #we could even use the header-generator to avoid defines
+    #and use xdg if it is available
     add_definitions(-DUSERDIR=".wagic")
-    set(Qt_required_modules QtOpenGL QtCore)
+    
 endif()
 
-if(platform_qt_console)
-    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_console_src})
-    add_definitions(-DQT_CONFIG)
-    add_definitions(-DUSERDIR=".wagic")
-    set(Qt_required_modules QtOpenGL QtCore)
+
+if(platform_qt_widget)
+    if(operating_system_linux)
+        add_library(jge ${JGE_generic_ssrc} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+        add_definitions(-DLINUX)
+    endif()
+
+    include_directories(../projects/mtg/qml/qmlapplicationviewer) #Qtmain
+    include_directories(../projects/mtg/include)  #precompiled header
+    
+    include_directories(${Boost_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
+    target_link_libraries(jge ${QT_LIBRARIES} GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+endif()
+
+if(platform_qt_console)    
+    if(operating_system_linux)
+        add_library(jge ${JGE_generic_ssrc} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
+        add_definitions(-DLINUX)
+    endif()
+    
+    include_directories(../projects/mtg/qml/qmlapplicationviewer) #Qtmain
+    include_directories(../projects/mtg/include) #precompiled header
+    
+    include_directories(${Boost_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
+    target_link_libraries(jge ${QT_LIBRARIES} GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+endif()
+
+if(platform_psp)
+    #setup PSPSDK:
+    find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
+    set(CMAKE_CXX_COMPILER ${PSPSDK_CXX_COMPILER})
+    
+    add_library(jge ${JGE_generic_ssrc} ${JGE_psp_src} ${JGE_hge_src} ${JGE_TinyXML_src})
+    
+    #use the local headers.
+    #TODO: Check if that is realy necessary in every case
+    include_directories(.)
+    include_directories(include/psp)
+    include_directories(include/psp/freetype2) 
+    include_directories(src/tinyxml)
+    include_directories(../Boost)
+    include_directories("${PSPSDK_PATH}/include")
+    
+    #some PSPSDK definitions
+    #TODO: move them into PSPSDK_DEFINES_DEBUG and ...RELEASE-vars to FindPSPSDK.cmake
+    add_definitions(-DDEVHOOK -DPSPFW3XX)
+    add_definitions(-G0 -DPSP -D_PSP_FW_VERSION=371)
+    
+    #TODO: check if we can link pspsdk right here 
+    #target_link_libraries(jge)
 endif()
 
 if(operating_system_windows)
     add_definitions(-DWIN32)
 endif()
 
-if(operating_system_linux)
-    set(JGE_SOURCES "${JGE_SOURCES}" ${JGE_linux_src} ${JGE_hge_src})
-    add_definitions(-DLINUX)
-endif()
-
-#turn automoc for filedownloader and corewrapper on
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC TRUE)
 
 
-#project options
-add_library(jge ${JGE_SOURCES} ${JGE_console_src})
-
-include_directories(include)
-include_directories(src/zipFS) #zipFS
-include_directories(../projects/mtg/qml/qmlapplicationviewer) #Qtmain
-include_directories(../projects/mtg/include) #precompiled header
-
-#3rd party stuff
-find_package(TinyXML REQUIRED)
-find_package(PNG REQUIRED)
-find_package(JPEG REQUIRED)
-find_package(ZLIB REQUIRED)
-find_package(GIF REQUIRED)
-find_package(GLUT REQUIRED)
-find_package(Qt4 REQUIRED ${Qt_required_modules})
-include(${QT_USE_FILE})
-
-include_directories(${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-target_link_libraries(jge ${QT_LIBRARIES} GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})

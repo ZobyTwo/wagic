@@ -1,4 +1,5 @@
-set(SOURCES         
+#MTGs common sources
+set(MTG_generic_src         
         src/AbilityParser.cpp
         src/ActionElement.cpp
         src/ActionLayer.cpp
@@ -109,66 +110,115 @@ set(SOURCES
         src/NetworkPlayer.cpp
         src/TestSuiteAI.cpp
         )
-        
-set(wagic_qt_graphic_src
+
+#the sources we need if we compile a graphical qt version
+#TODO: add declarative version since this only works with QWidget right now
+set(MTG_qt_graphic_src
         src/qt/filedownloader.cpp
         src/qt/corewrapper.cpp
         include/qt/corewrapper.h #so automoc finds it
         include/qt/filedownloader.h
         qml/qmlapplicationviewer/qmlapplicationviewer.cpp
         src/Qtmain.cpp)
-        
+
+#the sources we need to compile the testsuit
 set(wagic_qt_console_src
         src/Qtconsole.cpp)
+
+#common settings for all platforms
+include_directories(include)
+include_directories(../../JGE/include)
+include_directories(../../JGE/src/zipFS)
         
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC TRUE)
+#setup common qt stuff
+if( platform_qt)
+    set(Boost_USE_STATIC_LIBS OFF) 
+    set(Boost_USE_MULTITHREADED ON)  
+    set(Boost_USE_STATIC_RUNTIME OFF)
+    find_package(Boost COMPONENTS system thread)
+    find_package(TinyXML REQUIRED)
+    find_package(X11 REQUIRED)
+
+    set(CMAKE_INCLUDE_CURRENT_DIR ON)
+    set(CMAKE_AUTOMOC TRUE)
+    
+    #see JGE/CMakeLists.txt
+    add_definitions(-DQT_CONFIG)
+    add_definitions(-DUSERDIR=".wagic")
+endif()
 
 #build the graphical module
 if( platform_qt_widget)
+    if(operating_system_linux)
+        add_definitions(-DLINUX)
+    endif()
+
+    find_package(Qt4 COMPONENTS QtCore QtGui QtOpenGL QtNetwork REQUIRED)
+    include(${QT_USE_FILE})
     add_definitions(-DQT_WIDGET)
-    set(SOURCES "${SOURCES}" ${wagic_qt_graphic_src})
-    set(Qt_required_modules QtCore QtGui QtOpenGL QtNetwork)
-    add_definitions(-DQT_CONFIG)
-    add_definitions(-DUSERDIR=".wagic")
+
+    include_directories(include/qt)
+    include_directories(${QT_MKSPECS_DIR}/default)
+    add_executable(wagic ${MTG_generic_src}  ${wagic_qt_graphic_src})
+    
+    target_link_libraries(wagic jge ${QT_LIBRARIES} GL GLU glut ${X11_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
 endif()
 
 #or build the console module
 if( platform_qt_console)
+    if(operating_system_linux)
+        add_definitions(-DLINUX)
+    endif()
+
+    find_package(Qt4 COMPONENTS QtCore QtNetwork REQUIRED )
+    include(${QT_USE_FILE})
     add_definitions(-DCONSOLE_CONFIG -DTESTSUITE)
-    set(SOURCES "${SOURCES}" ${wagic_qt_console_src})
-    set(Qt_required_modules QtCore QtNetwork)
-    add_definitions(-DQT_CONFIG)
-    add_definitions(-DUSERDIR=".wagic")
+    
+    include_directories(include/qt)
+    include_directories(${QT_MKSPECS_DIR}/default)
+    add_executable(wagic ${MTG_generic_src} ${wagic_qt_console_src})
+    
+    target_link_libraries(wagic jge ${QT_LIBRARIES} GL GLU glut ${X11_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
 endif()
 
-if(operating_system_windows)
-    add_definitions(-DWIN32)
+if( platform_psp)
+    #setup PSPSDK
+    find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
+    
+    set(CMAKE_CXX_COMPILER ${PSPSDK_CXX_COMPILER})
+    
+    set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+    #now this is a somewhat dirty hack:
+    #CMAKE_CXX_LINK_EXECUTABLE is not exactly meant to be overwritten. but this seems to be the most easiest way 
+    #to change the linker command
+    set(CMAKE_CXX_LINK_EXECUTABLE "${PSPSDK_CXX_LINKER} <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
+    
+    add_executable(wagic ${MTG_generic_src})
+
+    #we might not need some of these...
+    include_directories("${PSPSDK_PATH}/include")
+    include_directories("../../JGE/include")
+    include_directories("../../JGE/src")
+    include_directories("../../JGE/src/zipFS")
+    include_directories("../../JGE/src/tinyxml")
+    include_directories("../../JGE/include/psp")
+    include_directories("../../JGE/include/psp/freetype2")
+    include_directories("../../projects/mtg/include")
+    include_directories("../../Boost")
+
+    #search for binary libaries, which are provided by JGE
+    #we may want to add targets to compile them
+    find_library(PSP_HGETOOLS_LIB NAMES hgetools HINTS "../../JGE/lib/psp")
+    find_library(PSP_FREETYPE_LIB NAMES freetype HINTS "../../JGE/lib/psp")
+    find_library(PSP_PNG_LIB NAMES png HINTS "../../JGE/lib/psp")
+    find_library(PSP_JPEG_LIB NAMES jpeg HINTS "../../JGE/lib/psp")
+    find_library(PSP_GIF_LIB NAMES gif HINTS "../../JGE/lib/psp")
+    find_library(PSP_MIKMOD NAMES mikmod HINTS "../../JGE/lib/psp")
+    
+    #some pspsdk definitions we might want to put into FindPSPSDK
+    add_definitions(-DDEVHOOK -DPSPFW3XX)
+    add_definitions(-G0 -DPSP -D_PSP_FW_VERSION=371)
+    
+    #Note: I tried to preserve the same link-order as in the original makefile
+    target_link_libraries(wagic jge ${HGETOOLS_LIB} ${FREETYPE_LIB} ${PSP_JPEG_LIB} ${PSP_GIF_LIB} ${PSP_PNG_LIB} z m ${PSP_MIKMOD} ${PSPSDK_LIB} stdc++ ${PSPSDK_REQUIRED_LIB})    
 endif()
-
-if(operating_system_linux)
-    add_definitions(-DLINUX)
-endif()
-
-add_executable(wagic ${SOURCES})
-include_directories(include)
-include_directories(include/qt)
-
-#jge
-include_directories(../../JGE/include)
-include_directories(../../JGE/src/zipFS)
-
-#3rd party stuff
-set(Boost_USE_STATIC_LIBS OFF) 
-set(Boost_USE_MULTITHREADED ON)  
-set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost COMPONENTS system thread)
-find_package(TinyXML REQUIRED)
-find_package(Qt4 REQUIRED QtCore QtGui QtOpenGL QtNetwork QtDeclarative)
-find_package(X11 REQUIRED)
-find_package(Qt4 REQUIRED ${Qt_required_modules})
-
-include(${QT_USE_FILE})
-include_directories(${Boost_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-
-target_link_libraries(wagic jge ${QT_LIBRARIES} GL GLU glut ${X11_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
