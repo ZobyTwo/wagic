@@ -157,8 +157,14 @@ if(platform_psp)
 endif()
 
 if(platform_sdl)
-    add_library(jge ${JGE_generic_src} ${JGE_hge_src} ${JGE_linux_src})
+    add_library(jge ${JGE_generic_src} ${JGE_hge_src} ${JGE_graphics_src} ${JGE_linux_src})
     
+    find_package(TinyXML REQUIRED)
+    find_package(PNG REQUIRED)
+    find_package(JPEG REQUIRED)
+    find_package(ZLIB REQUIRED)
+    find_package(GIF REQUIRED)
+    find_package(GLUT REQUIRED)
     set(Boost_USE_STATIC_LIBS OFF) 
     set(Boost_USE_MULTITHREADED ON)  
     set(Boost_USE_STATIC_RUNTIME OFF)
@@ -179,6 +185,7 @@ if(platform_sdl)
         add_definitions(-DLINUX)
     endif()
     
+    target_link_libraries(jge ${SDL2_LIBRARY} GL GLU glut ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
 endif()
 
 if(operating_system_windows)

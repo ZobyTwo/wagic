@@ -246,15 +246,14 @@ if(platform_sdl)
 
     add_definitions(-DSDL_CONFIG)
     
-    #sdl 2
     find_package(SDL2 REQUIRED)
-    include_directories(${SDL2_INCLUDE_DIR})
-    #sdl 1
-    #find_package(SDL REQUIRED)
-    #include_directories(${SDL_INCLUDE_DIR})
+    set(Boost_USE_STATIC_LIBS OFF) 
+    set(Boost_USE_MULTITHREADED ON)  
+    set(Boost_USE_STATIC_RUNTIME OFF)
+    find_package(Boost COMPONENTS system thread)
     
-    include_directories(${BOOST_INCLUDE_DIRS})
+    include_directories(${SDL2_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS})
     add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src})
-    target_link_libraries(wagic jge ${SDL2_LIBRARIES} GL GLU glut ${X11_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
+    target_link_libraries(wagic jge ${SDL2_LIBRARY} GL GLU glut ${X11_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
 endif()
 
