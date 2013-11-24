@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #if (defined ANDROID)
 #include <SDL_opengles.h>
 #else
