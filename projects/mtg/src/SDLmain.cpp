@@ -654,8 +654,17 @@ bool SdlApp::OnInit()
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE,	    8);
 	SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE,	8);
 
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,  1);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  2);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,  1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  2);
+
+    int buffers, samples;
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &buffers);
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &samples);
+    if ( buffers == 0 || samples == 0 )
+    { //no multisampling available
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,  0);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,  0);
+    }
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
