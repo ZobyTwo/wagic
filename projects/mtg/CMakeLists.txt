@@ -118,7 +118,6 @@ set(MTG_qt_graphic_src
         src/qt/corewrapper.cpp
         include/qt/corewrapper.h #so automoc finds it
         include/qt/filedownloader.h
-        qml/qmlapplicationviewer/qmlapplicationviewer.cpp
         src/Qtmain.cpp)
 
 #the sources we need to compile the testsuit
