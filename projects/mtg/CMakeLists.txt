@@ -278,13 +278,15 @@ if(platform_sdl)
         include_directories(../../JGE/include)
         include_directories(../../JGE/include/hge)
         
+		link_directories(${Boost_LIBRARY_DIR} ${SDL2_LIBRARY_DIR})
 		include_directories(${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR}
                             ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR})
-		add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src})
+		add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src} src/TestSuiteAI.cpp src/AIPlayerBakaB.cpp)
 		
 		#GL GLU glut... what is needed?
 		target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
-							${BOOST_date_time} ${HGE_LIBRARY})
+							${BOOST_date_time} ${HGE_LIBRARY} ${CMAKE_SOURCE_DIR}/thirdparty/binary/lib/fmodvc.lib
+							${SDL2_LIBRARY_DIR}/SDL2main.lib)
     endif()
 endif()
 

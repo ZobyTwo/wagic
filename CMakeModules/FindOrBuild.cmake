@@ -39,12 +39,15 @@ endmacro()
 
 macro(FindOrBuildSDL2)
 	set(SDL2DIR $ENV{SDL2_ROOT})
+	
 	find_package(SDL2)
     
     if(NOT SDL2_FOUND)    
 		find_path(SDL2_INCLUDE_DIR SDL.h HINTS ${SDL2DIR}/include)
 		find_library(SDL2_LIBRARY NAMES SDL2 HINTS ${SDL2DIR}/lib PATH_SUFFIXES x64 x86)
 		find_library(SDL2_MAIN_LIBRARY NAMES SDL2main HINTS ${SDL2DIR}/lib PATH_SUFFIXES x64 x86)
+		set(SDL2_LIBRARY_DIR ${SDL2DIR}/lib)
+		
 		set(SDL2_FOUND ON)
 	endif()
 endmacro()
@@ -68,7 +71,7 @@ macro(FindOrBuildBoost)
 	set(BOOST_ROOT $ENV{BOOST_ROOT})
 	set(BOOST_LIBRARYDIR ${BOOST_ROOT}/libs)
 	set(BOOST_INCLUDEDIR ${BOOST_ROOT})
-	find_package(Boost COMPONENTS system thread REQUIRED)
+	find_package(Boost COMPONENTS system thread date_time REQUIRED)
 endmacro()
 
 macro(FindOrBuildZLIB)

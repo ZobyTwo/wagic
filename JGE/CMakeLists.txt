@@ -165,6 +165,7 @@ if(platform_sdl)
 		FindOrBuildJPEG()
 		FindOrBuildBoost()
 		
+		link_directories(${Boost_LIBRARY_DIR} ${SDL2_LIBRARY_DIR})
 		include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR}
 							${GIF_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
 		add_library(jge-sdl ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
