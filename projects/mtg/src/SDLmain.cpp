@@ -1,3 +1,6 @@
+#include "JGE.h"
+#include "JTypes.h"
+
 #include <SDL.h>
 #if (defined ANDROID)
 #include <SDL_opengles.h>
@@ -8,12 +11,10 @@
 #endif
 #endif
 
-#include "../include/JGE.h"
-#include "../include/JTypes.h"
-#include "../include/JApp.h"
-#include "../include/JFileSystem.h"
-#include "../include/JRenderer.h"
-#include "../include/JGameLauncher.h"
+#include "JApp.h"
+#include "JFileSystem.h"
+#include "JRenderer.h"
+#include "JGameLauncher.h"
 #include "DebugRoutines.h"
 #include <stdexcept>
 #include <iostream>

@@ -73,10 +73,9 @@ if(platform_qt_console OR platform_qt_widget)
         FindOrBuildTinyXML()
         FindOrBuildZipFS()
         FindOrBuildUNZIP()
-        
-        find_package(PNG REQUIRED)
-        find_package(JPEG REQUIRED)
-        find_package(GIF REQUIRED)
+        FindOrBuildGIF()
+        FindOrBuildPNG()
+		FindOrBuildJPEG()
         
         find_package(Qt4 COMPONENTS QtOpenGL QtCore REQUIRED)
         include(${QT_USE_FILE})
@@ -145,10 +144,10 @@ if(platform_sdl)
         FindOrBuildZipFS()
         FindOrBuildSDL2()
         FindOrBuildUNZIP()
+		FindOrBuildGIF()
 		
 		find_package(PNG REQUIRED)
 		find_package(JPEG REQUIRED)
-		find_package(GIF REQUIRED)
 		
         include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR})
 		add_library(jge-sdl ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
@@ -156,24 +155,22 @@ if(platform_sdl)
 		
 	elseif(operating_system_windows)
         add_definitions(-DWIN32)
-        
-        message(FATAL_ERROR "sdl builds on windows are not supported but might work")
 		
-		#include_directories(../projects/mtg/include) #precompiled header
-		#include_directories(Dependencies/include)
-		#include_directories(Dependencies/SDL2/include)
-		#include_directories(../Boost)
-		#include_directories(src/zipFS)
-		#include_directories(../projects/mtg/extra) #dirent.h
-		#add_library(jge ${JGE_generic_src} ${JGE_TinyXML_src} ${JGE_hge_src} ${JGE_graphics_src} ${JGE_linux_src}) 
-		#set_property(TARGET jge PROPERTY COMPILE_DEFINITIONS_DEBUG _CRT_SECURE_NO_WARNINGS)
-        #                                        GL GLU glut ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
-		#target_link_libraries(jge ${SDL2_LIBRARY})
+        FindOrBuildZipFS()
+		FindOrBuildTinyXML()
+		FindOrBuildSDL2()
+        FindOrBuildUNZIP()
+		FindOrBuildGIF()
+		FindOrBuildPNG()
+		FindOrBuildJPEG()
+		FindOrBuildBoost()
+		
+		include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR}
+							${GIF_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+		add_library(jge-sdl ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+		set_property(TARGET jge-sdl PROPERTY COMPILE_DEFINITIONS_DEBUG _CRT_SECURE_NO_WARNINGS)
+		target_link_libraries(jge-sdl ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${GIF_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
     endif()
-endif()
-
-if(operating_system_windows)
-    add_definitions(-DWIN32)
 endif()
 
 

@@ -264,16 +264,27 @@ if(platform_sdl)
 		#GL GLU glut... what is needed?
 		target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} GL GLU glut ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${HGE_LIBRARY})
 	elseif(operating_system_windows)
-		set(SDL2_INCLUDE_DIR ../../JGE/Dependencies/SDL/include)
-		include_directories(../../JGE/Dependencies/include)
-		include_directories(../../Boost)
-		include_directories(../../JGE/src/tinyxml)
-		include_directories(${SDL2_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS})
+		add_definitions(-DWIN32)
+		
+		FindOrBuildSDL2()
+        FindOrBuildBoost()
+        FindOrBuildTinyXML()
+        FindOrBuildZipFS()
+        FindOrBuildUNZIP()
+		FindOrBuildZLIB()
+        
+		find_package(OpenGL REQUIRED)
+		
+        include_directories(../../JGE/include)
+        include_directories(../../JGE/include/hge)
+        
+		include_directories(${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR}
+                            ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR})
 		add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src})
-		include_directories(extra) #dirent.h
-		find_library(SDL2_LIBRARY NAMES SDL2 HINTS "../../JGE/Dependencies/SDL2/lib")
-		set_property(TARGET wagic PROPERTY COMPILE_DEFINITIONS_DEBUG _CRT_SECURE_NO_WARNINGS)
-		target_link_libraries(wagic jge ${SDL2_LIBRARY} GL GLU glut ${X11_LIBRARIES} ${Boost_LIBRARIES} ${GIF_LIBRARIES})
+		
+		#GL GLU glut... what is needed?
+		target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+							${BOOST_date_time} ${HGE_LIBRARY})
     endif()
 endif()
 

@@ -16,7 +16,6 @@ function (Add_Subdirectory_Once SUBDIRECTORY)
 endfunction (Add_Subdirectory_Once)
 
 macro(FindOrBuildZipFS)
-    #no way to find it currently
     Add_Subdirectory_Once(${CMAKE_SOURCE_DIR}/thirdparty/zipFS ${CMAKE_BINARY_DIR}/thirdparty/zipFS)
     
     set(ZIPFS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/zipFS)
@@ -39,14 +38,18 @@ macro(FindOrBuildTinyXML)
 endmacro()
 
 macro(FindOrBuildSDL2)
-    find_package(SDL2)
+	set(SDL2DIR $ENV{SDL2_ROOT})
+	find_package(SDL2)
     
-    if(NOT SDL2_FOUND)
-        #build SDL2 from source
-    endif()
+    if(NOT SDL2_FOUND)    
+		find_path(SDL2_INCLUDE_DIR SDL.h HINTS ${SDL2DIR}/include)
+		find_library(SDL2_LIBRARY NAMES SDL2 HINTS ${SDL2DIR}/lib PATH_SUFFIXES x64 x86)
+		find_library(SDL2_MAIN_LIBRARY NAMES SDL2main HINTS ${SDL2DIR}/lib PATH_SUFFIXES x64 x86)
+		set(SDL2_FOUND ON)
+	endif()
 endmacro()
 
-macro(FindOrBuildUNZIP)
+macro(FindOrBuildUNZIP)	
     Add_Subdirectory_Once(${CMAKE_SOURCE_DIR}/thirdparty/unzip ${CMAKE_BINARY_DIR}/thirdparty/unzip)
     
     set(UNZIP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/unzip)
@@ -54,13 +57,56 @@ macro(FindOrBuildUNZIP)
 endmacro()
 
 macro(FindOrBuildBoost)
-    if(NOT BOOST_FORCE_BUILD)
-        set(Boost_USE_STATIC_LIBS OFF) 
-        set(Boost_USE_MULTITHREADED ON)  
-        set(Boost_USE_STATIC_RUNTIME OFF)
-        find_package(Boost COMPONENTS system thread REQUIRED)
-    else()
-        set(BOOST_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/thirdparty/Boost)
-    endif()
-    #if not found...
+	set(Boost_USE_STATIC_LIBS ON)
+	set(Boost_USE_MULTITHREADED ON)
+
+	#set(Boost_USE_STATIC_LIBS OFF) 
+	#set(Boost_USE_MULTITHREADED ON)  
+	#set(Boost_USE_STATIC_RUNTIME OFF)
+	#set(Boost_DEBUG 1)
+    
+	set(BOOST_ROOT $ENV{BOOST_ROOT})
+	set(BOOST_LIBRARYDIR ${BOOST_ROOT}/libs)
+	set(BOOST_INCLUDEDIR ${BOOST_ROOT})
+	find_package(Boost COMPONENTS system thread REQUIRED)
+endmacro()
+
+macro(FindOrBuildZLIB)
+	find_package(ZLIB)
+	
+	if(NOT ZLIB_FOUND)
+		set(ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/binary/include/)
+		find_library(ZLIB_LIBRARY NAMES zlib HINTS ${CMAKE_SOURCE_DIR}/thirdparty/binary/lib)
+		set(ZLIB_FOUND ON)
+	endif()
+endmacro()
+
+macro(FindOrBuildGIF)
+	find_package(GIF)
+	
+	if(NOT GIF_FOUND)
+		set(GIF_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/binary/include/)
+		find_library(GIF_LIBRARIES NAMES giflib HINTS ${CMAKE_SOURCE_DIR}/thirdparty/binary/lib)
+		set(GIF_FOUND ON)
+	endif()
+endmacro()
+
+macro(FindOrBuildJPEG)
+	find_package(JPEG)
+	
+	if(NOT JPEG_FOUND)
+		set(JPEG_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/binary/include/)
+		find_library(JPEG_LIBRARIES NAMES libjpeg-static-mt HINTS ${CMAKE_SOURCE_DIR}/thirdparty/binary/lib)
+		set(JPEG_FOUND ON)
+	endif()
+endmacro()
+
+macro(FindOrBuildPNG)
+	find_package(PNG)
+	
+	if(NOT PNG_FOUND)
+		set(PNG_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/thirdparty/binary/include/)
+		find_library(PNG_LIBRARIES NAMES libpng HINTS ${CMAKE_SOURCE_DIR}/thirdparty/binary/lib)
+		set(PNG_FOUND ON)
+	endif()
 endmacro()

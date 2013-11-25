@@ -10,7 +10,7 @@
 #include "DebugRoutines.h"
 
 #ifdef WITH_FMOD
-#include "../../Dependencies/include/fmod.h"
+#include "fmod.h"
 #else
 #define FSOUND_FREE 0
 #endif

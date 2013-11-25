@@ -4,8 +4,8 @@
 
 */
 
-#include "../include/DebugRoutines.h"
-#include "../include/JNetwork.h"
+#include "DebugRoutines.h"
+#include "JNetwork.h"
 
 #if defined (WIN32) || defined (LINUX)
 #else
@@ -31,7 +31,7 @@
 #endif
 
 #include <sstream>
-#include "../include/JSocket.h"
+#include "JSocket.h"
 
 map<string, JNetwork::CommandStruc> JNetwork::sCommandMap;
 

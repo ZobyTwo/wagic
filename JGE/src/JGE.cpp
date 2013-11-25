@@ -34,7 +34,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 #if defined (WIN32)    // WIN32 specific code
-#include "../../Dependencies/include/fmod.h"
+#include "fmod.h"
 
 u8 JGE::GetAnalogX()
 {
