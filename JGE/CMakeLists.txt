@@ -75,7 +75,6 @@ set(JGE_TinyXML_src
 include_directories(include)
 include_directories(src/zipFS)
 
-
 #get common settings for all qt-builds done:
 if(platform_qt)
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -85,7 +84,12 @@ if(platform_qt)
     include(${QT_USE_FILE})
     
     #take the systems libs
-    find_package(TinyXML REQUIRED)
+	if(operating_system_linux)
+		find_package(TinyXML REQUIRED)
+	elseif(operating_system_windows)
+		set(TINYXML_INCLUDE_DIR src/tinyxml)
+	endif()
+	
     find_package(PNG REQUIRED)
     find_package(JPEG REQUIRED)
     find_package(ZLIB REQUIRED)
@@ -109,6 +113,9 @@ if(platform_qt_widget)
     if(operating_system_linux)
         add_library(jge ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
         add_definitions(-DLINUX)
+	elseif(operating_system_windows)
+        add_library(jge ${JGE_generic_src} ${JGE_TinyXML_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+        add_definitions(-DWIN32)
     endif()
 
     include_directories(../projects/mtg/qml/qmlapplicationviewer) #Qtmain
@@ -122,6 +129,9 @@ if(platform_qt_console)
     if(operating_system_linux)
         add_library(jge ${JGE_generic_src} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
         add_definitions(-DLINUX)
+	elseif(operating_system_windows)
+        add_library(jge ${JGE_generic_src} ${JGE_TinyXML_src} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
+        add_definitions(-DWIN32)
     endif()
     
     include_directories(../projects/mtg/qml/qmlapplicationviewer) #Qtmain
@@ -157,35 +167,42 @@ if(platform_psp)
 endif()
 
 if(platform_sdl)
-    add_library(jge ${JGE_generic_src} ${JGE_hge_src} ${JGE_graphics_src} ${JGE_linux_src})
-    
-    find_package(TinyXML REQUIRED)
-    find_package(PNG REQUIRED)
-    find_package(JPEG REQUIRED)
-    find_package(ZLIB REQUIRED)
-    find_package(GIF REQUIRED)
-    find_package(GLUT REQUIRED)
-    set(Boost_USE_STATIC_LIBS OFF) 
-    set(Boost_USE_MULTITHREADED ON)  
-    set(Boost_USE_STATIC_RUNTIME OFF)
-    find_package(Boost COMPONENTS system thread REQUIRED)
-    
-    #sdl 2
-    find_package(SDL2 REQUIRED)
-    include_directories(${SDL2_INCLUDE_DIR})
-    #sdl 1
-    #find_package(SDL REQUIRED)
-    #include_directories(${SDL_INCLUDE_DIR})
-    
-    include_directories(${BOOST_INCLUDE_DIRS})
-    include_directories(../projects/mtg/include) #precompiled header
-    add_definitions(-DSDL_CONFIG)
-    
-    if(operating_system_linux)
+	add_definitions(-DSDL_CONFIG)
+
+	if(operating_system_linux)
         add_definitions(-DLINUX)
+		
+		find_package(PNG REQUIRED)
+		find_package(JPEG REQUIRED)
+		find_package(ZLIB REQUIRED)
+		find_package(GIF REQUIRED)
+		find_package(GLUT REQUIRED)
+		set(Boost_USE_STATIC_LIBS OFF) 
+		set(Boost_USE_MULTITHREADED ON)  
+		set(Boost_USE_STATIC_RUNTIME OFF)
+		find_package(Boost COMPONENTS system thread REQUIRED)
+		find_package(SDL2 REQUIRED)
+		find_package(TinyXML REQUIRED)
+		
+		include_directories(../projects/mtg/include) #precompiled header
+		include_directories(${BOOST_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR})
+		add_library(jge ${JGE_generic_src} ${JGE_hge_src} ${JGE_graphics_src} ${JGE_linux_src})
+		target_link_libraries(jge ${SDL2_LIBRARY} GL GLU glut ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+	elseif(operating_system_windows)
+        add_definitions(-DWIN32)
+		
+		include_directories(../projects/mtg/include) #precompiled header
+		include_directories(Dependencies/include)
+		include_directories(Dependencies/SDL2/include)
+		include_directories(../Boost)
+		include_directories(src/zipFS)
+		include_directories(src/tinyxml)
+		include_directories(../projects/mtg/extra) #dirent.h
+		add_library(jge ${JGE_generic_src} ${JGE_TinyXML_src} ${JGE_hge_src} ${JGE_graphics_src} ${JGE_linux_src}) 
+		set_property(TARGET jge PROPERTY COMPILE_DEFINITIONS_DEBUG _CRT_SECURE_NO_WARNINGS)
+        #                                        GL GLU glut ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
+		target_link_libraries(jge ${SDL2_LIBRARY})
     endif()
-    
-    target_link_libraries(jge ${SDL2_LIBRARY} GL GLU glut ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
 endif()
 
 if(operating_system_windows)
