@@ -18,13 +18,7 @@
 #psp-config needs to be reachable via the system shell (PATH)
 find_program(PSP_CONFIG_PROGRAM psp-config)
 
-#TODO: check if something is REQUIRED and throw errors instead of messages
-    
-    add_custom_command(TARGET wagic POST_BUILD
-        COMMAND ${PSPSDK_FIXUP_IMPORTS_COMMAND} ARGS wagic
-        COMMAND ${PSPSDK_PRXGEN_COMMAND} ARGS wagic wagic.prx
-        COMMAND ${PSPSDK_PACK_PBP_COMMAND} ARGS EBOOT.PBP PARAM.SFO icon.png NULL pic0.png pic1.png NULL wagic.prx NULL)
-        
+#TODO: check if something is REQUIRED and throw errors instead of messages        
 if(PSP_CONFIG_PROGRAM)
     find_program(PSPSDK_CXX_COMPILER psp-g++)
     find_program(PSPSDK_CXX_LINKER psp-gcc)
