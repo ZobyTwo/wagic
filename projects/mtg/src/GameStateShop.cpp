@@ -11,7 +11,7 @@
 #include "Translate.h"
 #include "TestSuiteAI.h"
 
-#include <hge/hgedistort.h>
+#include <hgedistort.h>
 #include "WFont.h"
 
 float GameStateShop::_x1[] = { 79, 19, 27, 103, 154, 187, 102, 144, 198, 133, 183 };

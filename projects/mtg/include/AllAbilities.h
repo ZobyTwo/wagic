@@ -17,7 +17,7 @@
 #include "Subtypes.h"
 #include "ThisDescriptor.h"
 #include <JGui.h>
-#include <hge/hgeparticle.h>
+#include <hgeparticle.h>
 #include "IconButton.h"
 #include "ExtraCost.h"
 

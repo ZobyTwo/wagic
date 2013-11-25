@@ -3,7 +3,7 @@
 #ifndef _CARD_GUI_H_
 #define _CARD_GUI_H_
 
-#include <hge/hgeparticle.h>
+#include <hgeparticle.h>
 #include <JGui.h>
 #include "Pos.h"
 #include "PlayGuiObject.h"

@@ -7,7 +7,7 @@ A class for very simple menus structure
 #include <string>
 #include <JGui.h>
 #include "WFont.h"
-#include "hge/hgeparticle.h"
+#include <hgeparticle.h>
 #include "WResourceManager.h"
 #include "WResource_Fwd.h"
 

@@ -11,7 +11,7 @@
 #include <JGE.h>
 #include <JSprite.h>
 #include <JLBFont.h>
-#include <hge/hgeparticle.h>
+#include <hgeparticle.h>
 #include "WResourceManager.h"
 
 #include "GameState.h"

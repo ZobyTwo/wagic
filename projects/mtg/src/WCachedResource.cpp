@@ -4,7 +4,6 @@
 #include <JFileSystem.h>
 #include "WResourceManager.h"
 #include "WCachedResource.h"
-#include <hge/hgeparticle.h>
 
 #ifdef WITH_FMOD
 #endif

@@ -3,7 +3,7 @@
 
 #include "WFont.h"
 #include <JGui.h>
-#include <hge/hgeparticle.h>
+#include <hgeparticle.h>
 #include <string>
 using namespace std;
 

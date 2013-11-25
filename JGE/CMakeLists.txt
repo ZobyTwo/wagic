@@ -19,13 +19,8 @@ set(JGE_generic_src
         src/JSpline.cpp
         src/JNetwork.cpp
         src/JSprite.cpp
-        src/Vector2D.cpp
-        src/zipFS/zfsystem.cpp
-        src/zipFS/ziphdr.cpp
-        src/zipFS/zstream.cpp)
+        src/Vector2D.cpp)
 
-#the sources we need to compile libhge
-#NOTE: we do not build an extra lib but compile it directly into jge
 set(JGE_hge_src
         src/hge/hgecolor.cpp
         src/hge/hgedistort.cpp
@@ -64,144 +59,116 @@ set(JGE_psp_src
         src/main.cpp
         src/vram.cpp)
         
-#these sources are needed if we want to cross-compile tinyxml
-set(JGE_TinyXML_src
-        src/tinyxml/tinystr.cpp
-        src/tinyxml/tinyxmlerror.cpp
-        src/tinyxml/tinyxmlparser.cpp
-        src/tinyxml/tinyxml.cpp)
-        
 #get common settings for all platforms done:
 include_directories(include)
-include_directories(src/zipFS)
+include_directories(include/hge)
 
-#get common settings for all qt-builds done:
-if(platform_qt)
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-    set(CMAKE_AUTOMOC TRUE)
-    
-    find_package(Qt4 COMPONENTS QtOpenGL QtCore REQUIRED)
-    include(${QT_USE_FILE})
-    
-    #take the systems libs
-	if(operating_system_linux)
-		find_package(TinyXML REQUIRED)
-	elseif(operating_system_windows)
-		set(TINYXML_INCLUDE_DIR src/tinyxml)
-	endif()
-	
-    find_package(PNG REQUIRED)
-    find_package(JPEG REQUIRED)
-    find_package(ZLIB REQUIRED)
-    find_package(GIF REQUIRED)
-    find_package(GLUT REQUIRED)
-    set(Boost_USE_STATIC_LIBS OFF) 
-    set(Boost_USE_MULTITHREADED ON)  
-    set(Boost_USE_STATIC_RUNTIME OFF)
-    find_package(Boost COMPONENTS system thread REQUIRED)
-    
+if(platform_qt_console OR platform_qt_widget)
     add_definitions(-DQT_CONFIG)
-    #there may be better ways to get those dirs
-    #we could even use the header-generator to avoid defines
-    #and use xdg if it is available
-    add_definitions(-DUSERDIR=".wagic")
     
-endif()
-
-
-if(platform_qt_widget)
     if(operating_system_linux)
-        add_library(jge ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
         add_definitions(-DLINUX)
-	elseif(operating_system_windows)
-        add_library(jge ${JGE_generic_src} ${JGE_TinyXML_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
-        add_definitions(-DWIN32)
-    endif()
-
-    include_directories(../projects/mtg/qml/qmlapplicationviewer) #Qtmain
-    include_directories(../projects/mtg/include)  #precompiled header
-    
-    include_directories(${Boost_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-    target_link_libraries(jge ${QT_LIBRARIES} GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
-endif()
-
-if(platform_qt_console)    
-    if(operating_system_linux)
-        add_library(jge ${JGE_generic_src} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
-        add_definitions(-DLINUX)
-	elseif(operating_system_windows)
-        add_library(jge ${JGE_generic_src} ${JGE_TinyXML_src} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
-        add_definitions(-DWIN32)
-    endif()
-    
-    include_directories(../projects/mtg/qml/qmlapplicationviewer) #Qtmain
-    include_directories(../projects/mtg/include) #precompiled header
-    
-    include_directories(${Boost_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-    target_link_libraries(jge ${QT_LIBRARIES} GL GLU glut ${TINYXML_LIBRARIES} ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+        add_definitions(-DUSERDIR=".wagic")
+        
+        FindOrBuildTinyXML()
+        FindOrBuildZipFS()
+        FindOrBuildUNZIP()
+        
+        find_package(PNG REQUIRED)
+        find_package(JPEG REQUIRED)
+        find_package(GIF REQUIRED)
+        
+        find_package(Qt4 COMPONENTS QtOpenGL QtCore REQUIRED)
+        include(${QT_USE_FILE})
+           
+        include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
+        if(platform_qt_console)
+            add_library(jge-qt-console ${JGE_generic_src} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
+            target_link_libraries(jge-qt-console  ${QT_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} 
+                                  ${GIF_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+        else()
+            add_library(jge-qt-widget ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+            target_link_libraries(jge-qt-widget  ${QT_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} 
+                                  ${GIF_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+        endif()
+    elseif(operating_system_windows)
+        message(FATAL_ERROR "qt builds of jge on windows are currently not supported")
+    endif()    
 endif()
 
 if(platform_psp)
-    #setup PSPSDK:
-    find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
-    set(CMAKE_CXX_COMPILER ${PSPSDK_CXX_COMPILER})
-    
-    add_library(jge ${JGE_generic_src} ${JGE_psp_src} ${JGE_hge_src} ${JGE_TinyXML_src})
-    
-    #use the local headers.
-    #TODO: Check if that is realy necessary in every case
-    include_directories(.)
-    include_directories(include/psp)
-    include_directories(include/psp/freetype2) 
-    include_directories(src/tinyxml)
-    include_directories(../Boost)
-    include_directories("${PSPSDK_PATH}/include")
-    
-    #some PSPSDK definitions
-    #TODO: move them into PSPSDK_DEFINES_DEBUG and ...RELEASE-vars to FindPSPSDK.cmake
+    add_definitions(-DPSP)
+    add_definitions(-D_PSP_FW_VERSION=371)
     add_definitions(-DDEVHOOK -DPSPFW3XX)
-    add_definitions(-G0 -DPSP -D_PSP_FW_VERSION=371)
     
-    #TODO: check if we can link pspsdk right here 
-    #target_link_libraries(jge)
+    if(operating_system_linux)
+        #this is a cross-compile. we do not specify -DLINUX
+        find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
+    
+        #setup PSPSDK:
+        set(CMAKE_CXX_COMPILER ${PSPSDK_CXX_COMPILER})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -G0")
+        
+        set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+        set(CMAKE_CXX_LINK_EXECUTABLE "${PSPSDK_CXX_LINKER} <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
+    
+        #TODO: move them into PSPSDK_DEFINES_DEBUG and ...RELEASE-vars to FindPSPSDK.cmake
+    
+        set(EXTRA_INCLUDES ${PSPSDK_PATH}/include)
+        set(TINYXML_FORCE_BUILD ON)
+        set(BOOST_FORCE_BUILD ON)
+        
+        FindOrBuildTinyXML()
+        FindOrBuildZipFS()
+        FindOrBuildUNZIP()
+        FindOrBuildBoost()
+        
+        #TODO: put in FIndPSPLIBS.cmake -script
+        include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
+        include_directories(${PSPSDK_PATH}/include)
+        include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS})
+    
+        add_library(jge-psp ${JGE_generic_src} ${JGE_psp_src} ${JGE_hge_src})
+        target_link_libraries(jge-psp ${TINYXML_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY})
+    else()
+        message(FATAL_ERROR "psp builds currently not supported on platforms other than linux")
+    endif()
 endif()
 
-if(platform_sdl)
+if(platform_sdl)	
 	add_definitions(-DSDL_CONFIG)
 
 	if(operating_system_linux)
         add_definitions(-DLINUX)
 		
+        FindOrBuildTinyXML()
+        FindOrBuildZipFS()
+        FindOrBuildSDL2()
+        FindOrBuildUNZIP()
+		
 		find_package(PNG REQUIRED)
 		find_package(JPEG REQUIRED)
-		find_package(ZLIB REQUIRED)
 		find_package(GIF REQUIRED)
-		find_package(GLUT REQUIRED)
-		set(Boost_USE_STATIC_LIBS OFF) 
-		set(Boost_USE_MULTITHREADED ON)  
-		set(Boost_USE_STATIC_RUNTIME OFF)
-		find_package(Boost COMPONENTS system thread REQUIRED)
-		find_package(SDL2 REQUIRED)
-		find_package(TinyXML REQUIRED)
 		
-		include_directories(../projects/mtg/include) #precompiled header
-		include_directories(${BOOST_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR})
-		add_library(jge ${JGE_generic_src} ${JGE_hge_src} ${JGE_graphics_src} ${JGE_linux_src})
-		target_link_libraries(jge ${SDL2_LIBRARY} GL GLU glut ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+        include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR})
+		add_library(jge-sdl ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+		target_link_libraries(jge-sdl ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${GIF_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+		
 	elseif(operating_system_windows)
         add_definitions(-DWIN32)
+        
+        message(FATAL_ERROR "sdl builds on windows are not supported but might work")
 		
-		include_directories(../projects/mtg/include) #precompiled header
-		include_directories(Dependencies/include)
-		include_directories(Dependencies/SDL2/include)
-		include_directories(../Boost)
-		include_directories(src/zipFS)
-		include_directories(src/tinyxml)
-		include_directories(../projects/mtg/extra) #dirent.h
-		add_library(jge ${JGE_generic_src} ${JGE_TinyXML_src} ${JGE_hge_src} ${JGE_graphics_src} ${JGE_linux_src}) 
-		set_property(TARGET jge PROPERTY COMPILE_DEFINITIONS_DEBUG _CRT_SECURE_NO_WARNINGS)
+		#include_directories(../projects/mtg/include) #precompiled header
+		#include_directories(Dependencies/include)
+		#include_directories(Dependencies/SDL2/include)
+		#include_directories(../Boost)
+		#include_directories(src/zipFS)
+		#include_directories(../projects/mtg/extra) #dirent.h
+		#add_library(jge ${JGE_generic_src} ${JGE_TinyXML_src} ${JGE_hge_src} ${JGE_graphics_src} ${JGE_linux_src}) 
+		#set_property(TARGET jge PROPERTY COMPILE_DEFINITIONS_DEBUG _CRT_SECURE_NO_WARNINGS)
         #                                        GL GLU glut ${GIF_LIBRARIES} ${ZLIB_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES}
-		target_link_libraries(jge ${SDL2_LIBRARY})
+		#target_link_libraries(jge ${SDL2_LIBRARY})
     endif()
 endif()
 

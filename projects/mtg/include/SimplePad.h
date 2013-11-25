@@ -4,7 +4,7 @@
 #include <string>
 #include <JGui.h>
 #include <JLBFont.h>
-#include "hge/hgeparticle.h"
+#include <hgeparticle.h>
 
 enum SIMPLE_KEYS{
   KPD_A,  KPD_B,  KPD_C,  KPD_D,  KPD_E,  KPD_F,

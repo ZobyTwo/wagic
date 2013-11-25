@@ -3,7 +3,7 @@
 
 #include "string.h"
 #include <vector>
-#include <hge/hgeparticle.h>
+#include <hgeparticle.h>
 #include "JGE.h"
 #include "MTGDefinitions.h"
 #include "Pos.h"

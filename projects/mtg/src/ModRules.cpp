@@ -5,7 +5,6 @@
 #include "GameState.h"
 #include <tinyxml.h>
 
-
 ModRules gModRules;
 
 bool ModRules::load(string filename)

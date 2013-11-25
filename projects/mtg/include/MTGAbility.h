@@ -18,7 +18,7 @@ class Counter;
 #include "ActionElement.h"
 #include <string>
 #include <map>
-#include <hge/hgeparticle.h>
+#include <hgeparticle.h>
 #include "Damage.h"
 #include "TargetChooser.h"
 using std::string;

@@ -9,6 +9,7 @@
 #include "SimpleMenu.h"
 #include "Pos.h"
 #include "CardGui.h"
+#include <hgedistort.h>
 
 /** 
   Provides an interface to retrieve some standardized colors. The idea here is that a child of WGuiBase 

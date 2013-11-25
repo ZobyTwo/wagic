@@ -1,6 +1,6 @@
 #ifndef _WCACHEDRESOURCE_H_
 #define _WCACHEDRESOURCE_H_
-#include <hge/hgeparticle.h>
+#include <hgeparticle.h>
 
 #if defined WIN32 || defined LINUX
 #define INVALID_MTEX ((GLuint) -1)

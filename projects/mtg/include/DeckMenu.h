@@ -6,7 +6,7 @@
 
 #include <string>
 #include "WFont.h"
-#include "hge/hgeparticle.h"
+#include <hgeparticle.h>
 #include "DeckMetaData.h"
 #include "TextScroller.h"
 #include "InteractiveButton.h"
