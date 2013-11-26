@@ -11,8 +11,9 @@ execute_process(COMMAND psp-config --pspsdk-path OUTPUT_VARIABLE PSPSDK_PATH OUT
 execute_process(COMMAND psp-config --psp-prefix  OUTPUT_VARIABLE PSPSDK_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
 	
 # specify compiler and linker:
+set(CMAKE_CXX_COMPILER_FORCED ON)
 find_program(CMAKE_CXX_COMPILER psp-g++)
-find_program(CMAKE_C_COMPILER   psp-gcc)
+#find_program(CMAKE_C_COMPILER   psp-gcc)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -G0")
 
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
@@ -27,13 +28,15 @@ SET(CMAKE_SYSTEM_INCLUDE_PATH
 	${PSPSDK_PATH}/include 
 	${PSPSDK_PATH}/../include 
 	${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/include 
-	${CMAKE_INSTALL_PREFIX}/include)
+	${CMAKE_INSTALL_PREFIX}/include
+	${CMAKE_SYSTEM_INCLUDE_PATH})
 	
 SET(CMAKE_SYSTEM_LIBRARY_PATH 
 	${PSPSDK_PATH}/lib 
 	${PSPSDK_PATH}/../lib
 	${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib 
-	${CMAKE_INSTALL_PREFIX}/lib)
+	${CMAKE_INSTALL_PREFIX}/lib
+	${CMAKE_SYSTEM_LIBRARY_PATH})
 
 SET(CMAKE_FIND_ROOT_PATH  
 	${PSPSDK_PATH}

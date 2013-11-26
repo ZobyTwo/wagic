@@ -150,12 +150,13 @@ if(platform_psp)
 	FindOrBuildTinyXML()
 	FindOrBuildZipFS()
 	FindOrBuildUNZIP()
-	#FindOrBuildBoost()
+	FindOrBuildGIF()
+	FindOrBuildBoost()
         
 	#TODO: put in FIndPSPLIBS.cmake -script
 	include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
 	include_directories(${PSPSDK_PATH}/include)
-	include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS})
+	include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${GIF_INCLUDE_DIR})
     
 	add_library(jge-psp ${JGE_generic_src} ${JGE_psp_src} ${JGE_hge_src})
 	target_link_libraries(jge-psp ${TINYXML_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY})

@@ -249,28 +249,18 @@ if( platform_psp)
 	FindOrBuildFreetype()
 	FindOrBuildHgeTools()
 	FindOrBuildMikMod()
+	FindOrBuildBoost()
 	
-	#FindOrBuildBoost()
-	
+    include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
+    include_directories(${PSPSDK_PATH}/include)
 	include_directories(${CMAKE_SOURCE_DIR}/JGE/include)
 	include_directories(${CMAKE_SOURCE_DIR}/JGE/include/hge)
-	include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR})# ${BOOST_INCLUDE_DIRS})
-
-	#search for binary libaries, which are prebuild.
-	#TODO: put in FIndPSPLIBS.cmake -script
-	#we may even build them from src
-	#include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
-	#find_library(PSP_HGETOOLS_LIB NAMES hgetools HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
-	#find_library(PSP_FREETYPE_LIB NAMES freetype HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
-	#find_library(PSP_PNG_LIB NAMES png HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
-	
-	#find_library(PSP_JPEG_LIB NAMES jpeg HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
-	#find_library(PSP_GIF_LIB NAMES gif HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
+	include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${GIF_INCLUDE_DIR})
 	
 	add_executable(wagic ${MTG_generic_src})
 
 	target_link_libraries(wagic jge-psp ${HGETOOLS_LIB} ${FREETYPE_LIB} ${JPEG_LIBRARIES} 
-							${GIF_LIBRARIES} ${PSP_PNG_LIB} z m ${PSP_MIKMOD} ${PSPSDK_LIB} 
+							${GIF_LIBRARIES} ${PNG_LIBRARIES} z m ${PSP_MIKMOD} ${PSPSDK_LIB} 
 							${TINYXML_LIBRARIES} stdc++ ${PSPSDK_REQUIRED_LIB})
 
 	set(PRXSPECS_FILE "${PSPSDK_PATH}/lib/prxspecs")
