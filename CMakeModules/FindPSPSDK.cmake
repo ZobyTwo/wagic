@@ -26,19 +26,17 @@ if(PSP_CONFIG_PROGRAM)
     find_program(PSPSDK_PRXGEN_COMMAND psp-prxgen)
     find_program(PSPSDK_PACK_PBP_COMMAND pack-pbp)
     find_program(PSPSDK_MKSFO_COMMAND mksfo)
-    
+
     #ask psp-config for the 
     execute_process(COMMAND psp-config --pspsdk-path OUTPUT_VARIABLE PSPSDK_PATH OUTPUT_STRIP_TRAILING_WHITESPACE)
     execute_process(COMMAND psp-config --psp-prefix  OUTPUT_VARIABLE PSPSDK_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-    
+	
     set(PSPSDK_INCLUDE_DIR "${PSPSDK_PATH}/include")
     
-    #find libs which the user specified via the COMPONENTS parameter
-    set(PSPSDK_LIB_PATH "${PSPSDK_PATH}/lib" "${PSPSDK_PATH}/include/libc")
     foreach(_COMPONENT ${PSPSDK_FIND_COMPONENTS})
-        find_library(PSPSDK_${_COMPONENT} NAMES ${_COMPONENT} HINTS ${PSPSDK_LIB_PATH})
+        find_library(PSPSDK_${_COMPONENT} NAMES ${_COMPONENT})
         if(NOT PSPSDK_${_COMPONENT})
-            message("PSPSDK: ${_COMPONENT} not found")
+            message(SEND_ERROR "PSPSDK: ${_COMPONENT} not found")
         else()
             set(PSPSDK_LIB ${PSPSDK_LIB} ${PSPSDK_${_COMPONENT}})
         endif()
@@ -46,9 +44,9 @@ if(PSP_CONFIG_PROGRAM)
     
     #find libs which pspsdk does require to link even if the programs does not need one of them directly
     foreach(_COMPONENT pspdebug pspdisplay pspge pspctrl pspsdk c pspnet pspnet_inet pspnet_apctl pspnet_resolver psputility pspuser)
-        find_library(PSPSDK_${_COMPONENT} NAMES ${_COMPONENT} HINTS ${PSPSDK_LIB_PATH})
+        find_library(PSPSDK_${_COMPONENT} NAMES ${_COMPONENT})
         if(NOT PSPSDK_${_COMPONENT})
-            message("PSPSDK: ${_COMPONENT} not found")
+            message(SEND_ERROR "PSPSDK: ${_COMPONENT} not found")
         else()
             set(PSPSDK_REQUIRED_LIB ${PSPSDK_REQUIRED_LIB} ${PSPSDK_${_COMPONENT}})
         endif()

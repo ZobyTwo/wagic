@@ -95,45 +95,6 @@ if(platform_qt_console OR platform_qt_widget)
     endif()    
 endif()
 
-if(platform_psp)
-    add_definitions(-DPSP)
-    add_definitions(-D_PSP_FW_VERSION=371)
-    add_definitions(-DDEVHOOK -DPSPFW3XX)
-    
-    if(operating_system_linux)
-        #this is a cross-compile. we do not specify -DLINUX
-        find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
-    
-        #setup PSPSDK:
-        set(CMAKE_CXX_COMPILER ${PSPSDK_CXX_COMPILER})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -G0")
-        
-        set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
-        set(CMAKE_CXX_LINK_EXECUTABLE "${PSPSDK_CXX_LINKER} <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
-    
-        #TODO: move them into PSPSDK_DEFINES_DEBUG and ...RELEASE-vars to FindPSPSDK.cmake
-    
-        set(EXTRA_INCLUDES ${PSPSDK_PATH}/include)
-        set(TINYXML_FORCE_BUILD ON)
-        set(BOOST_FORCE_BUILD ON)
-        
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildUNZIP()
-        FindOrBuildBoost()
-        
-        #TODO: put in FIndPSPLIBS.cmake -script
-        include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
-        include_directories(${PSPSDK_PATH}/include)
-        include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS})
-    
-        add_library(jge-psp ${JGE_generic_src} ${JGE_psp_src} ${JGE_hge_src})
-        target_link_libraries(jge-psp ${TINYXML_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY})
-    else()
-        message(FATAL_ERROR "psp builds currently not supported on platforms other than linux")
-    endif()
-endif()
-
 if(platform_sdl)	
 	add_definitions(-DSDL_CONFIG)
 
@@ -174,5 +135,29 @@ if(platform_sdl)
     endif()
 endif()
 
-
+if(platform_psp)
+    add_definitions(-DPSP)
+    add_definitions(-D_PSP_FW_VERSION=371)
+    add_definitions(-DDEVHOOK -DPSPFW3XX)
+    
+	#this is a cross-compile. we do not specify -DLINUX
+	find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
+        
+	set(EXTRA_INCLUDES ${PSPSDK_PATH}/include)
+	set(TINYXML_FORCE_BUILD ON)
+	set(BOOST_FORCE_BUILD ON)
+        
+	FindOrBuildTinyXML()
+	FindOrBuildZipFS()
+	FindOrBuildUNZIP()
+	#FindOrBuildBoost()
+        
+	#TODO: put in FIndPSPLIBS.cmake -script
+	include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
+	include_directories(${PSPSDK_PATH}/include)
+	include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS})
+    
+	add_library(jge-psp ${JGE_generic_src} ${JGE_psp_src} ${JGE_hge_src})
+	target_link_libraries(jge-psp ${TINYXML_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY})
+endif()
 

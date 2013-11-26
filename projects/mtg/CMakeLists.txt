@@ -177,69 +177,6 @@ if(platform_qt)
     endif()
 endif()
 
-if( platform_psp)
-    add_definitions(-DPSP)
-    add_definitions(-D_PSP_FW_VERSION=371)
-    add_definitions(-DDEVHOOK -DPSPFW3XX)
-    
-    if(operating_system_linux)
-        #this is a cross-compile. we do not specify -DLINUX
-        find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
-    
-        set(CMAKE_CXX_COMPILER ${PSPSDK_CXX_COMPILER})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -G0")
-    
-        set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
-        set(CMAKE_CXX_LINK_EXECUTABLE "${PSPSDK_CXX_LINKER} <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
-    
-        set(EXTRA_INCLUDES ${PSPSDK_PATH}/include)
-        
-        set(TINYXML_FORCE_BUILD ON)
-        set(BOOST_FORCE_BUILD ON)
-        
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildUNZIP()
-        FindOrBuildBoost()
-        
-        include_directories(${CMAKE_SOURCE_DIR}/JGE/include)
-        include_directories(${CMAKE_SOURCE_DIR}/JGE/include/hge)
-        include_directories(${PSPSDK_PATH}/include ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS})
-
-        #search for binary libaries, which are prebuild.
-        #TODO: put in FIndPSPLIBS.cmake -script
-        #we may even build them from src
-        include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
-        find_library(PSP_HGETOOLS_LIB NAMES hgetools HINTS "${CMAKE_SOURCE_DIR}/thirdparty/psp/lib")
-        find_library(PSP_FREETYPE_LIB NAMES freetype HINTS "${CMAKE_SOURCE_DIR}/thirdparty/psp/lib")
-        find_library(PSP_PNG_LIB NAMES png HINTS "${CMAKE_SOURCE_DIR}/thirdparty/psp/lib")
-        find_library(PSP_JPEG_LIB NAMES jpeg HINTS "${CMAKE_SOURCE_DIR}/thirdparty/psp/lib")
-        find_library(PSP_GIF_LIB NAMES gif HINTS "${CMAKE_SOURCE_DIR}/thirdparty/psp/lib")
-        find_library(PSP_MIKMOD NAMES mikmod HINTS "${CMAKE_SOURCE_DIR}/thirdparty/psp/lib")
-    
-        add_executable(wagic ${MTG_generic_src})
-    
-        target_link_libraries(wagic jge-psp ${HGETOOLS_LIB} ${FREETYPE_LIB} ${PSP_JPEG_LIB} 
-                                ${PSP_GIF_LIB} ${PSP_PNG_LIB} z m ${PSP_MIKMOD} ${PSPSDK_LIB} 
-                                ${TINYXML_LIBRARIES} stdc++ ${PSPSDK_REQUIRED_LIB})
-    
-        set(PRXSPECS_FILE "${PSPSDK_PATH}/lib/prxspecs")
-        set(LINKFILE_FILE "${PSPSDK_PATH}/lib/linkfile.prx")
-    
-        get_property(wagic_elf_location TARGET wagic PROPERTY LOCATION)
-        get_filename_component(wagic_elf_directory ${wagic_elf_location} PATH)
-    
-        set_target_properties(wagic PROPERTIES LINK_FLAGS "-specs=${PRXSPECS_FILE} -Wl,-q,-T${LINKFILE_FILE}")
-        add_custom_command(TARGET wagic POST_BUILD
-            COMMAND ${PSPSDK_MKSFO_COMMAND} ARGS "'Wagic, the Homebrew?!'" "${wagic_elf_directory}/PARAM.SFO"
-            COMMAND ${PSPSDK_FIXUP_IMPORTS_COMMAND} ARGS ${wagic_elf_location}
-            COMMAND ${PSPSDK_PRXGEN_COMMAND} ARGS ${wagic_elf_location} "${wagic_elf_directory}/wagic.prx"
-            COMMAND ${PSPSDK_PACK_PBP_COMMAND} ARGS ${wagic_elf_directory}/EBOOT.PBP ${wagic_elf_directory}/PARAM.SFO ${CMAKE_CURRENT_SOURCE_DIR}/icon.png NULL ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png NULL "${wagic_elf_directory}/wagic.prx" NULL)
-    else()
-        message(FATAL_ERROR "psp builds are not supported on platforms other than linux")
-    endif()
-endif()
-
 if(platform_sdl)
     add_definitions(-DSDL_CONFIG)
     
@@ -290,3 +227,62 @@ if(platform_sdl)
     endif()
 endif()
 
+if( platform_psp)
+    add_definitions(-DPSP)
+    add_definitions(-D_PSP_FW_VERSION=371)
+    add_definitions(-DDEVHOOK -DPSPFW3XX)
+
+	#this is a cross-compile. we do not specify -DLINUX
+	find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
+
+	set(EXTRA_INCLUDES ${PSPSDK_PATH}/include)
+	set(TINYXML_FORCE_BUILD ON)
+	set(BOOST_FORCE_BUILD ON)
+	
+	FindOrBuildTinyXML()
+	FindOrBuildZipFS()
+	FindOrBuildUNZIP()
+	
+	FindOrBuildGIF()
+	FindOrBuildJPEG()
+	FindOrBuildPNG()
+	FindOrBuildFreetype()
+	FindOrBuildHgeTools()
+	FindOrBuildMikMod()
+	
+	#FindOrBuildBoost()
+	
+	include_directories(${CMAKE_SOURCE_DIR}/JGE/include)
+	include_directories(${CMAKE_SOURCE_DIR}/JGE/include/hge)
+	include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR})# ${BOOST_INCLUDE_DIRS})
+
+	#search for binary libaries, which are prebuild.
+	#TODO: put in FIndPSPLIBS.cmake -script
+	#we may even build them from src
+	#include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
+	#find_library(PSP_HGETOOLS_LIB NAMES hgetools HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
+	#find_library(PSP_FREETYPE_LIB NAMES freetype HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
+	#find_library(PSP_PNG_LIB NAMES png HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
+	
+	#find_library(PSP_JPEG_LIB NAMES jpeg HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
+	#find_library(PSP_GIF_LIB NAMES gif HINTS "${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib")
+	
+	add_executable(wagic ${MTG_generic_src})
+
+	target_link_libraries(wagic jge-psp ${HGETOOLS_LIB} ${FREETYPE_LIB} ${JPEG_LIBRARIES} 
+							${GIF_LIBRARIES} ${PSP_PNG_LIB} z m ${PSP_MIKMOD} ${PSPSDK_LIB} 
+							${TINYXML_LIBRARIES} stdc++ ${PSPSDK_REQUIRED_LIB})
+
+	set(PRXSPECS_FILE "${PSPSDK_PATH}/lib/prxspecs")
+	set(LINKFILE_FILE "${PSPSDK_PATH}/lib/linkfile.prx")
+
+	get_property(wagic_elf_location TARGET wagic PROPERTY LOCATION)
+	get_filename_component(wagic_elf_directory ${wagic_elf_location} PATH)
+
+	set_target_properties(wagic PROPERTIES LINK_FLAGS "-specs=${PRXSPECS_FILE} -Wl,-q,-T${LINKFILE_FILE}")
+	add_custom_command(TARGET wagic POST_BUILD
+		COMMAND ${PSPSDK_MKSFO_COMMAND} ARGS "'Wagic, the Homebrew?!'" "${wagic_elf_directory}/PARAM.SFO"
+		COMMAND ${PSPSDK_FIXUP_IMPORTS_COMMAND} ARGS ${wagic_elf_location}
+		COMMAND ${PSPSDK_PRXGEN_COMMAND} ARGS ${wagic_elf_location} "${wagic_elf_directory}/wagic.prx"
+		COMMAND ${PSPSDK_PACK_PBP_COMMAND} ARGS ${wagic_elf_directory}/EBOOT.PBP ${wagic_elf_directory}/PARAM.SFO ${CMAKE_CURRENT_SOURCE_DIR}/icon.png NULL ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png NULL "${wagic_elf_directory}/wagic.prx" NULL)
+endif()
