@@ -13,7 +13,9 @@ execute_process(COMMAND psp-config --psp-prefix  OUTPUT_VARIABLE PSPSDK_PREFIX O
 # specify compiler and linker:
 set(CMAKE_CXX_COMPILER_FORCED ON)
 find_program(CMAKE_CXX_COMPILER psp-g++)
-#find_program(CMAKE_C_COMPILER   psp-gcc)
+set(CMAKE_C_COMPILER_FORCED ON)
+find_program(CMAKE_C_COMPILER   psp-gcc)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -G0")
 
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
@@ -25,29 +27,31 @@ SET(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ".a")
 
 # where is the target environment 
 SET(CMAKE_SYSTEM_INCLUDE_PATH 
-	${PSPSDK_PATH}/include 
-	${PSPSDK_PATH}/../include 
 	${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/include 
+	${PSPSDK_PATH}/include 
+	${PSPSDK_PREFIX}/include 
 	${CMAKE_INSTALL_PREFIX}/include
 	${CMAKE_SYSTEM_INCLUDE_PATH})
+
+	message("dirent.h is in ${PSPSDK_PREFIX}/include")
 	
 SET(CMAKE_SYSTEM_LIBRARY_PATH 
-	${PSPSDK_PATH}/lib 
-	${PSPSDK_PATH}/../lib
 	${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib 
+	${PSPSDK_PATH}/lib 
+	${PSPSDK_PREFIX}/lib
 	${CMAKE_INSTALL_PREFIX}/lib
 	${CMAKE_SYSTEM_LIBRARY_PATH})
 
 SET(CMAKE_FIND_ROOT_PATH  
-	${PSPSDK_PATH}
-	${PSPSDK_PATH}/lib
-	${PSPSDK_PATH}/include
-	${PSPSDK_PATH}/..
-	${PSPSDK_PATH}/../lib
-	${PSPSDK_PATH}/../include
 	${CMAKE_SOURCE_DIR}/thirdparty/binary/psp
 	${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib
 	${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/include
+	${PSPSDK_PATH}
+	${PSPSDK_PATH}/lib
+	${PSPSDK_PATH}/include
+	${PSPSDK_PREFIX}
+	${PSPSDK_PREFIX}/lib
+	${PSPSDK_PREFIX}/include
 	)
 
 # search for programs in the build host directories
