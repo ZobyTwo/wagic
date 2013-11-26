@@ -222,8 +222,7 @@ if(platform_sdl)
 		
 		#GL GLU glut... what is needed?
 		target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
-							${BOOST_date_time} ${HGE_LIBRARY} ${CMAKE_SOURCE_DIR}/thirdparty/binary/lib/fmodvc.lib
-							${SDL2_LIBRARY_DIR}/SDL2main.lib)
+							${BOOST_date_time} ${HGE_LIBRARY} ${CMAKE_SOURCE_DIR}/thirdparty/binary/win/lib/fmodvc.lib)
     endif()
 endif()
 
