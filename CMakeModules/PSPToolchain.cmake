@@ -32,8 +32,6 @@ SET(CMAKE_SYSTEM_INCLUDE_PATH
 	${PSPSDK_PREFIX}/include 
 	${CMAKE_INSTALL_PREFIX}/include
 	${CMAKE_SYSTEM_INCLUDE_PATH})
-
-	message("dirent.h is in ${PSPSDK_PREFIX}/include")
 	
 SET(CMAKE_SYSTEM_LIBRARY_PATH 
 	${CMAKE_SOURCE_DIR}/thirdparty/binary/psp/lib 
