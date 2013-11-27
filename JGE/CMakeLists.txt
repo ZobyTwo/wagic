@@ -44,6 +44,10 @@ set(JGE_console_src
 set(JGE_linux_src
         src/pc/JSocket.cpp
         src/pc/JSfx.cpp)
+        
+set(JGE_android_src
+        src/JSocket.cpp 
+        src/android/JSfx.cpp)
 
 #the sources we need if we compile for psp
 #note: main.cpp contains the main-function.
@@ -108,11 +112,27 @@ if(platform_sdl)
 		FindOrBuildGIF()
 		FindOrBuildPNG()
 		FindOrBuildJPEG()
+        FindOrBuildBoost()
 		
-        include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR})
+        include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${PNG_INCLUDE_DIRS} ${BOOST_INCLUDE_DIRS})
 		add_library(jge-sdl ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
 		target_link_libraries(jge-sdl ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${GIF_LIBRARIES} ${JPEG_LIBRARY} ${PNG_LIBRARIES})
-		
+    elseif(operating_system_android)
+        add_definitions(-DANDROID -DLINUX)
+        
+        FindOrBuildTinyXML()
+        FindOrBuildZipFS()
+        FindOrBuildSDL2()
+        FindOrBuildUNZIP()
+        FindOrBuildPNG()
+        FindOrBuildJPEG()
+        FindOrBuildBoost()
+        find_package(OpenSL)
+        
+        include_directories(${BOOST_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} 
+                            ${UNZIP_INCLUDE_DIR} ${PNG_INCLUDE_DIRS} ${JPEG_INCLUDE_DIR} ${OPENSL_INCLUDE_DIR})
+        add_library(jge-sdl ${JGE_generic_src} ${JGE_android_src} ${JGE_graphics_src} ${JGE_hge_src})
+        target_link_libraries(jge-sdl ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${JPEG_LIBRARY} ${PNG_LIBRARIES} ${OPENSL_LIBRARIES}) 
 	elseif(operating_system_windows)
         add_definitions(-DWIN32)
 		

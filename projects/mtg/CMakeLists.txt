@@ -200,6 +200,32 @@ if(platform_sdl)
 		
 		#GL GLU glut... what is needed?
 		target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} GL GLU glut ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${HGE_LIBRARY})
+    elseif(operating_system_android)
+        add_definitions(-DANDROID -DLINUX)
+        
+        FindOrBuildSDL2()
+        FindOrBuildBoost()
+        FindOrBuildTinyXML()
+        FindOrBuildZipFS()
+        FindOrBuildUNZIP()
+        
+        #find_package(OpenGL REQUIRED)
+        
+        include_directories(../../JGE/include)
+        include_directories(../../JGE/include/hge)
+        
+        include_directories(${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR}
+                            ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
+        #this is a dirty hack. we should require build android boost libs or provide easy means to build them
+        #but to compile them into our app is somewhat strange
+        add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src}
+                    ${ANDROID_BOOST_PTHREAD_SRC_DIR}/thread.cpp
+                    ${ANDROID_BOOST_PTHREAD_SRC_DIR}/once.cpp
+                    ${ANDROID_BOOST_SYSTEM_SRC_DIR}/error_code.cpp)
+        
+        #Gwhat is needed? most likely -ldl -lGLESv1_CM -lGLESv2 -llog -landroid . but to hardcode this is UUUUUUGGLY
+        target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} -ldl -lGLESv1_CM -lGLESv2 -llog -landroid ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${HGE_LIBRARY})
+    
 	elseif(operating_system_windows)
 		add_definitions(-DWIN32)
 		
