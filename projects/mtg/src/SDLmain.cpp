@@ -603,7 +603,7 @@ void SdlApp::OnTouchEvent(const SDL_TouchFingerEvent& event)
                 if (eventTime - lastFingerDownTime <= kTapEventTimeout)
                 {
                     // treat an up finger within 50 pixels of the down finger coords as a double click event
-                    if (abs(mMouseDownX - event.x) < kHitzonePliancy && abs(mMouseDownY - event.y) < kHitzonePliancy)
+                    if (abs(mMouseDownX - int(event.x)) < kHitzonePliancy && abs(mMouseDownY - int(event.y)) < kHitzonePliancy)
                     {
                     	DebugTrace("Pressing OK BUtton");
                         g_engine->HoldKey_NoRepeat(JGE_BTN_OK);
@@ -635,8 +635,8 @@ bool SdlApp::OnInit()
     DebugTrace("Video Display : h " << currentDisplayMode.h << ", w " << currentDisplayMode.w);
 
 #if (defined ANDROID) || (defined IOS)
-	window_w = pVideoInfo->current_w;
-	window_h = pVideoInfo->current_h;
+	window_w = currentDisplayMode.h;
+	window_h = currentDisplayMode.w;
 #else
 	window_w = ACTUAL_SCREEN_WIDTH;
 	window_h = ACTUAL_SCREEN_HEIGHT;
