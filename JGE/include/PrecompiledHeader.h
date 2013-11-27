@@ -18,9 +18,9 @@
 #include "JFileSystem.h"
 #include "JLogger.h"
 
-#ifndef WP8
-#include <boost/shared_ptr.hpp>
-#endif
+//#ifndef WP8
+//#include <boost/shared_ptr.hpp>
+//#endif
 
 #if defined (WP8) || defined (IOS) || defined (ANDROID) || defined (QT_CONFIG) || defined (SDL_CONFIG)
 #define TOUCH_ENABLED
