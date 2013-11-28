@@ -22,6 +22,8 @@ if(DEFINED CMAKE_BUILD_TYPE)
   set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 endif()
 
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Application output directory")
+
 
 project(wagic CXX C)
 #todo: somehow determine wagics version
@@ -100,9 +102,6 @@ if(ANDROID)
     WAGIC_OPTION(BUILD_ANDROID_PACKAGE "put the compiled code in an android package" ON)
 endif()
 
-#set output paths
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Application output directory")
-
 if(ANDROID)
     set(LIBRARY_OUTPUT_PATH        "${CMAKE_BINARY_DIR}/lib/${ANDROID_NDK_ABI_NAME}")
     set(3P_LIBRARY_OUTPUT_PATH     "${CMAKE_BINARY_DIR}/3rdparty/lib/${ANDROID_NDK_ABI_NAME}")
@@ -127,8 +126,11 @@ if(CMAKE_GENERATOR MATCHES "Makefiles|Ninja" AND "${CMAKE_BUILD_TYPE}" STREQUAL 
   set(CMAKE_BUILD_TYPE Debug)
 endif()
 
+include(FindOrBuild)
+
 #set platform dependend configurations
 if(PSP)
+    FindOrBuildPSPSDK()
     include(platforms/psp/configure.cmake)
 elseif(WIN32)
     include(platforms/win/configure.cmake)
@@ -141,12 +143,15 @@ endif()
 #set backend dependend configurations
 if(backend_qt_console OR backend_qt_widget)
     add_definitions(-DQT_CONFIG)
+    if(backend_qt_console)
+        add_definitions(-DTESTSUITE -D_DEBUG)
+        add_definitions(-DCONSOLE_CONFIG -DCAPTURE_STDERR)
+    endif()
 elseif(backend_sdl)
     add_definitions(-DSDL_CONFIG)
 endif()
 
 # find or build 3rd party libraries
-include(FindOrBuild)
 
 FindOrBuildOpenGL()
 FindOrBuildTinyXML()
@@ -167,7 +172,6 @@ if(backend_psp)
     FindOrBuildFreetype()
     FindOrBuildHgeTools()
     FindOrBuildMikMod()
-    FindOrBuildPSPSDK()
 endif()
 if(backend_qt_console OR backend_qt_widget)
     FindOrBuildQt()
@@ -177,6 +181,6 @@ endif()
 add_subdirectory(JGE)
 add_subdirectory(projects/mtg)
 
-if(BUILD_ANDROID_PACKAGE)
-  add_subdirectory(platforms/android/package)
-endif()
+#if(BUILD_ANDROID_PACKAGE)
+#  add_subdirectory(platforms/android/package)
+#endif()

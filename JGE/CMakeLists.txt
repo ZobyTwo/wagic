@@ -38,6 +38,7 @@ set(JGE_graphics_src
 #the sources we need to fake graphical output on desktops
 #these are used for the console-only testsuit
 set(JGE_console_src
+        src/OutputCapturer.cpp
         src/JGfx-fake.cpp)
 
 #the sources we need on linux

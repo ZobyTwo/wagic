@@ -140,10 +140,10 @@ endif()
 
 if(backend_qt_console)
     if(UNIX AND NOT ANDROID)
-        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
+        include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
             ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-        set(MTG_SOURCES ${MTG_generic_src} ${MTG_qt_console_src})
-        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${QT_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} 
+        add_executable(wagic ${MTG_generic_src} ${MTG_qt_console_src})
+        target_link_libraries(wagic  ${JGE_LIBRARY} ${QT_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} 
             ${HGE_LIBRARY})
     else()
         message(FATAL_ERROR "qt-console bilds are only supported on unix platforms")
@@ -152,10 +152,10 @@ endif()
 
 if(backend_qt_widget)
     if(UNIX AND NOT ANDROID)
-        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
+        include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
             ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-        set(MTG_SOURCES ${MTG_generic_src} ${MTG_qt_graphic_src})
-        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+        add_executable(wagic ${MTG_generic_src} ${MTG_qt_graphic_src})
+        target_link_libraries(wagic  ${JGE_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
             ${Boost_LIBRARIES} ${HGE_LIBRARY})# ${X11_LIBRARIES})
     else()
         message(FATAL_ERROR "qt-widget bilds are only supported on unix platforms")
@@ -164,29 +164,29 @@ endif()
 
 if(backend_sdl)
     if(UNIX AND NOT ANDROID)
-        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+        include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
             ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
-        set(MTG_SOURCES ${MTG_generic_src} ${MTG_sdl_src})
-        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+        add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src})
+        target_link_libraries(wagic  ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
             ${Boost_LIBRARIES} ${HGE_LIBRARY})
     elseif(ANDROID)
-        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+        include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
             ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
         #we should try to get rid of this hack
-        set(MTG_SOURCES ${MTG_generic_src} ${MTG_sdl_src}
+        add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src}
                     ${ANDROID_BOOST_PTHREAD_SRC_DIR}/thread.cpp
                     ${ANDROID_BOOST_PTHREAD_SRC_DIR}/once.cpp
                     ${ANDROID_BOOST_SYSTEM_SRC_DIR}/error_code.cpp
                     src/TestSuiteAI.cpp)
-        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+        target_link_libraries(wagic  ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
             ${Boost_LIBRARIES} ${HGE_LIBRARY})
     elseif(WIN32)
-        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+        include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
             ${Boost_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} 
             ${ZLIB_INCLUDE_DIR})
-        set(MTG_SOURCES ${MTG_generic_src} ${MTG_sdl_src} src/TestSuiteAI.cpp src/AIPlayerBakaB.cpp)
-        set(MTG_LINK_DIRECTORIES ${Boost_LIBRARY_DIR} ${SDL2_LIBRARY_DIR})
-        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+        add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src} src/TestSuiteAI.cpp src/AIPlayerBakaB.cpp)
+        link_directories(${Boost_LIBRARY_DIR} ${SDL2_LIBRARY_DIR})
+        target_link_libraries(wagic  ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
             ${BOOST_date_time} ${HGE_LIBRARY} ${CMAKE_SOURCE_DIR}/thirdparty/binary/win/lib/fmodvc.lib)
     endif()
 endif()
@@ -194,10 +194,10 @@ endif()
 if(backend_psp)
     if(PSP)
         #${PSPSDK_PATH}/include
-        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+        include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
             ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${GIF_INCLUDE_DIR} ${HGETOOLS_INCLUDE_DIRS})
-        set(MTG_SOURCES ${MTG_generic_src})
-        set(MTG_LINK_LIBRARIES ${HGETOOLS_LIBRARY} ${FREETYPE_LIB} ${JPEG_LIBRARIES} 
+        add_executable(wagic ${MTG_generic_src})
+        target_link_libraries(wagic ${JGE_LIBRARY} ${HGETOOLS_LIBRARY} ${FREETYPE_LIB} ${JPEG_LIBRARY} 
             ${GIF_LIBRARIES} ${PNG_LIBRARIES} z m ${MIKMOD_LIBRARY} ${PSPSDK_LIB} ${TINYXML_LIBRARIES} 
             stdc++ ${PSPSDK_REQUIRED_LIB})
 
@@ -218,7 +218,3 @@ if(backend_psp)
         message(FATAL_ERROR "use the cross-compile toolchain to build as the psp target")
     endif()
 endif()
-
-add_executable(wagic ${MTG_SOURCES})
-include_directories(${MTG_INCLUDE_DIRS} ${MTG_INTERNAL_INCLUDE_DIRS})
-target_link_libraries(wagic ${MTG_LINK_LIBRARIES})

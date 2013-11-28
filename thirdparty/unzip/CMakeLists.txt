@@ -5,12 +5,11 @@ SET(SOURCE
     miniunz.c
     unzip.c)
 
-FindOrBuildZLIB()
 include_directories(${ZLIB_INCLUDE_DIR} ${EXTRA_INCLUDES} ${ZLIB_INCLUDE_DIR})
 
 add_library(unzip ${SOURCE})
 target_link_libraries(unzip ${ZLIB_LIBRARY})
 
-if(platform_psp)
+if(PSP)
 	set_target_properties(unzip PROPERTIES COMPILE_FLAGS "-Dunix")
 endif()
