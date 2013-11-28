@@ -4,7 +4,10 @@ set(SOURCES
     tinyxmlparser.cpp
     tinyxml.cpp)
     
+#if(ANDROID)
+#    include_directories(${PSPSDK_PATH}/include)
+#endif()
+    
 add_definitions(-DTIXML_USE_STL)
-include_directories(${EXTRA_INCLUDES})
 
 add_library(tinyxml ${SOURCES})

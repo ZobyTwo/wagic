@@ -127,177 +127,97 @@ set(MTG_qt_console_src
 set(MTG_sdl_src
         src/SDLmain.cpp)
 
-#common settings for all platforms
-include_directories(include)
-        
-#qt builds
-if(platform_qt)
+
+set(MTG_INCLUDE_DIRS include include/qt)
+set(JGE_INCLUDE_DIRS ../../JGE/include ../../JGE/include/hge)
+set(JGE_LIBRARY jge)
+    
+#turn moc on
+if(backend_qt_console OR backend_qt_widget)
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
     set(CMAKE_AUTOMOC TRUE)
-    
-    add_definitions(-DQT_CONFIG)
-    
-    if(operating_system_linux)
-        add_definitions(-DLINUX)
-        add_definitions(-DUSERDIR=".wagic")
-    
-        FindOrBuildBoost()
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildUNZIP()
-        
-        if(platform_qt_console)
-            add_definitions(-DCONSOLE_CONFIG -DTESTSUITE)
-            find_package(Qt4 COMPONENTS QtCore QtNetwork REQUIRED)
-        elseif(platform_qt_widget)
-            add_definitions(-DQT_WIDGET)
-            find_package(OpenGL REQUIRED)
-            find_package(X11 REQUIRED)
-            find_package(Qt4 COMPONENTS QtCore QtGui QtOpenGL QtNetwork REQUIRED)
-        endif()
-        
-        include_directories(../../JGE/include)
-        include_directories(../../JGE/include/hge)
-        include_directories(include/qt)
-        
-        include(${QT_USE_FILE})
-        include_directories(${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR}
-                            ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-        
-        if(platform_qt_console)
-            add_executable(wagic ${MTG_generic_src} ${MTG_qt_console_src})
-            target_link_libraries(wagic jge-qt-console ${QT_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${HGE_LIBRARY})
-        elseif(platform_qt_widget)
-            add_executable(wagic ${MTG_generic_src} ${MTG_qt_graphic_src})
-            target_link_libraries(wagic jge-qt-widget ${QT_LIBRARIES} GL ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} 
-                                 ${HGE_LIBRARY} ${X11_LIBRARIES})
-        endif()
+endif()
+
+if(backend_qt_console)
+    if(UNIX)
+        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
+            ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
+        set(MTG_SOURCES ${MTG_generic_src} ${MTG_qt_console_src})
+        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${QT_LIBRARIES} ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} 
+            ${HGE_LIBRARY})
     else()
-        message( FATAL_ERROR "qt-console builds are currently not supported on os != linux")
+        message(FATAL_ERROR "qt-console bilds are only supported on unix platforms")
     endif()
 endif()
 
-if(platform_sdl)
-    add_definitions(-DSDL_CONFIG)
-    
-	if(operating_system_linux)
-        add_definitions(-DLINUX)
-		
-		FindOrBuildSDL2()
-        FindOrBuildBoost()
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildUNZIP()
-        
-		find_package(OpenGL REQUIRED)
-		
-        include_directories(../../JGE/include)
-        include_directories(../../JGE/include/hge)
-        
-		include_directories(${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR}
-                            ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
-		add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src})
-		
-		#GL GLU glut... what is needed?
-		target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} GL GLU glut ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${HGE_LIBRARY})
-    elseif(operating_system_android)
-        add_definitions(-DANDROID -DLINUX)
-        
-        FindOrBuildSDL2()
-        FindOrBuildBoost()
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildUNZIP()
-        
-        #find_package(OpenGL REQUIRED)
-        
-        include_directories(../../JGE/include)
-        include_directories(../../JGE/include/hge)
-        
-        include_directories(${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR}
-                            ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
-        #this is a dirty hack. we should require build android boost libs or provide easy means to build them
-        #but to compile them into our app is somewhat strange
-        add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src}
+if(backend_qt_widget)
+    if(UNIX)
+        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
+            ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
+        set(MTG_SOURCES ${MTG_generic_src} ${MTG_qt_graphic_src})
+        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+            ${Boost_LIBRARIES} ${HGE_LIBRARY})# ${X11_LIBRARIES})
+    else()
+        message(FATAL_ERROR "qt-widget bilds are only supported on unix platforms")
+    endif()
+endif()
+
+if(backend_sdl)
+    if(UNIX)
+        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+            ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
+        set(MTG_SOURCES ${MTG_generic_src} ${MTG_sdl_src})
+        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+            ${Boost_LIBRARIES} ${HGE_LIBRARY})
+    elseif(ANDROID)
+        set(MTG_INTERNAL_INCLUDE_DIRS ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
+            ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
+        #we should try to get rid of this hack
+        set(MTG_SOURCES ${MTG_generic_src} ${MTG_sdl_src}
                     ${ANDROID_BOOST_PTHREAD_SRC_DIR}/thread.cpp
                     ${ANDROID_BOOST_PTHREAD_SRC_DIR}/once.cpp
                     ${ANDROID_BOOST_SYSTEM_SRC_DIR}/error_code.cpp)
-        
-        #Gwhat is needed? most likely -ldl -lGLESv1_CM -lGLESv2 -llog -landroid . but to hardcode this is UUUUUUGGLY
-        target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} -ldl -lGLESv1_CM -lGLESv2 -llog -landroid ${TINYXML_LIBRARIES} ${Boost_LIBRARIES} ${HGE_LIBRARY})
-    
-	elseif(operating_system_windows)
-		add_definitions(-DWIN32)
-		
-		FindOrBuildSDL2()
-        FindOrBuildBoost()
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildUNZIP()
-		FindOrBuildZLIB()
-        
-		find_package(OpenGL REQUIRED)
-		
-        include_directories(../../JGE/include)
-        include_directories(../../JGE/include/hge)
-        
-		link_directories(${Boost_LIBRARY_DIR} ${SDL2_LIBRARY_DIR})
-		include_directories(${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR}
-                            ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR})
-		add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src} src/TestSuiteAI.cpp src/AIPlayerBakaB.cpp)
-		
-		#GL GLU glut... what is needed?
-		target_link_libraries(wagic jge-sdl ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
-							${BOOST_date_time} ${HGE_LIBRARY} ${CMAKE_SOURCE_DIR}/thirdparty/binary/win/lib/fmodvc.lib)
+        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+            ${Boost_LIBRARIES} ${HGE_LIBRARY})
+    elseif(WIN32)
+        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+            ${Boost_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} 
+            ${ZLIB_INCLUDE_DIR})
+        set(MTG_SOURCES ${MTG_generic_src} ${MTG_sdl_src} src/TestSuiteAI.cpp src/AIPlayerBakaB.cpp)
+        set(MTG_LINK_DIRECTORIES ${Boost_LIBRARY_DIR} ${SDL2_LIBRARY_DIR})
+        set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
+            ${BOOST_date_time} ${HGE_LIBRARY} ${CMAKE_SOURCE_DIR}/thirdparty/binary/win/lib/fmodvc.lib)
     endif()
 endif()
 
-if( platform_psp)
-    add_definitions(-DPSP)
-    add_definitions(-D_PSP_FW_VERSION=371)
-    add_definitions(-DDEVHOOK -DPSPFW3XX)
+if(backend_psp)
+    if(PSP)
+        #${PSPSDK_PATH}/include
+        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+            ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${GIF_INCLUDE_DIR} ${HGETOOLS_INCLUDE_DIRS})
+        set(MTG_SOURCES ${MTG_generic_src})
+        set(MTG_LINK_LIBRARIES ${HGETOOLS_LIBRARY} ${FREETYPE_LIB} ${JPEG_LIBRARIES} 
+            ${GIF_LIBRARIES} ${PNG_LIBRARIES} z m ${MIKMOD_LIBRARY} ${PSPSDK_LIB} ${TINYXML_LIBRARIES} 
+            stdc++ ${PSPSDK_REQUIRED_LIB})
 
-	#this is a cross-compile. we do not specify -DLINUX
-	find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
+        set(PRXSPECS_FILE "${PSPSDK_PATH}/lib/prxspecs")
+        set(LINKFILE_FILE "${PSPSDK_PATH}/lib/linkfile.prx")
 
-	set(EXTRA_INCLUDES ${PSPSDK_PATH}/include)
-	set(TINYXML_FORCE_BUILD ON)
-	set(BOOST_FORCE_BUILD ON)
-	
-	FindOrBuildTinyXML()
-	FindOrBuildZipFS()
-	FindOrBuildUNZIP()
-	
-	FindOrBuildGIF()
-	FindOrBuildJPEG()
-	FindOrBuildPNG()
-	FindOrBuildFreetype()
-	FindOrBuildHgeTools()
-	FindOrBuildMikMod()
-	FindOrBuildBoost()
-	
-    include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
-    include_directories(${PSPSDK_PATH}/include)
-	include_directories(${CMAKE_SOURCE_DIR}/JGE/include)
-	include_directories(${CMAKE_SOURCE_DIR}/JGE/include/hge)
-	include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${GIF_INCLUDE_DIR})
-	
-	add_executable(wagic ${MTG_generic_src})
+        get_property(wagic_elf_location TARGET wagic PROPERTY LOCATION)
+        get_filename_component(wagic_elf_directory ${wagic_elf_location} PATH)
 
-	target_link_libraries(wagic jge-psp ${HGETOOLS_LIB} ${FREETYPE_LIB} ${JPEG_LIBRARIES} 
-							${GIF_LIBRARIES} ${PNG_LIBRARIES} z m ${PSP_MIKMOD} ${PSPSDK_LIB} 
-							${TINYXML_LIBRARIES} stdc++ ${PSPSDK_REQUIRED_LIB})
-
-	set(PRXSPECS_FILE "${PSPSDK_PATH}/lib/prxspecs")
-	set(LINKFILE_FILE "${PSPSDK_PATH}/lib/linkfile.prx")
-
-	get_property(wagic_elf_location TARGET wagic PROPERTY LOCATION)
-	get_filename_component(wagic_elf_directory ${wagic_elf_location} PATH)
-
-	set_target_properties(wagic PROPERTIES LINK_FLAGS "-specs=${PRXSPECS_FILE} -Wl,-q,-T${LINKFILE_FILE}")
-	add_custom_command(TARGET wagic POST_BUILD
-		COMMAND ${PSPSDK_MKSFO_COMMAND} ARGS "'Wagic, the Homebrew?!'" "${wagic_elf_directory}/PARAM.SFO"
-		COMMAND ${PSPSDK_FIXUP_IMPORTS_COMMAND} ARGS ${wagic_elf_location}
-		COMMAND ${PSPSDK_PRXGEN_COMMAND} ARGS ${wagic_elf_location} "${wagic_elf_directory}/wagic.prx"
-		COMMAND ${PSPSDK_PACK_PBP_COMMAND} ARGS ${wagic_elf_directory}/EBOOT.PBP ${wagic_elf_directory}/PARAM.SFO ${CMAKE_CURRENT_SOURCE_DIR}/icon.png NULL ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png NULL "${wagic_elf_directory}/wagic.prx" NULL)
+        set_target_properties(wagic PROPERTIES LINK_FLAGS "-specs=${PRXSPECS_FILE} -Wl,-q,-T${LINKFILE_FILE}")
+        
+        add_custom_command(TARGET wagic POST_BUILD
+            COMMAND ${PSPSDK_MKSFO_COMMAND} ARGS "'Wagic, the Homebrew?!'" "${wagic_elf_directory}/PARAM.SFO"
+            COMMAND ${PSPSDK_FIXUP_IMPORTS_COMMAND} ARGS ${wagic_elf_location}
+            COMMAND ${PSPSDK_PRXGEN_COMMAND} ARGS ${wagic_elf_location} "${wagic_elf_directory}/wagic.prx"
+            COMMAND ${PSPSDK_PACK_PBP_COMMAND} ARGS ${wagic_elf_directory}/EBOOT.PBP ${wagic_elf_directory}/PARAM.SFO ${CMAKE_CURRENT_SOURCE_DIR}/icon.png NULL ${CMAKE_CURRENT_SOURCE_DIR}/pic0.png ${CMAKE_CURRENT_SOURCE_DIR}/pic1.png NULL "${wagic_elf_directory}/wagic.prx" NULL)
+    else()
+        message(FATAL_ERROR "use the cross-compile toolchain to build as the psp target")
+    endif()
 endif()
+
+add_executable(wagic ${MTG_SOURCES})
+include_directories(${MTG_INCLUDE_DIRS} ${MTG_INTERNAL_INCLUDE_DIRS})
+target_link_libraries(wagic ${MTG_LINK_LIBRARIES})

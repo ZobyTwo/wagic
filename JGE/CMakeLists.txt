@@ -62,122 +62,72 @@ set(JGE_psp_src
         src/decoder_prx.cpp
         src/main.cpp
         src/vram.cpp)
-        
-#get common settings for all platforms done:
-include_directories(include)
-include_directories(include/hge)
 
-if(platform_qt_console OR platform_qt_widget)
-    add_definitions(-DQT_CONFIG)
-    
-    if(operating_system_linux)
-        add_definitions(-DLINUX)
-        add_definitions(-DUSERDIR=".wagic")
-        
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildUNZIP()
-        FindOrBuildGIF()
-        FindOrBuildPNG()
-		FindOrBuildJPEG()
-        
-        find_package(Qt4 COMPONENTS QtOpenGL QtCore REQUIRED)
-        include(${QT_USE_FILE})
-           
-        include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
-        if(platform_qt_console)
-            add_library(jge-qt-console ${JGE_generic_src} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
-            target_link_libraries(jge-qt-console  ${QT_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} 
-                                  ${GIF_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
-        else()
-            add_library(jge-qt-widget ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
-            target_link_libraries(jge-qt-widget  ${QT_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} 
-                                  ${GIF_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
-        endif()
-    elseif(operating_system_windows)
-        message(FATAL_ERROR "qt builds of jge on windows are currently not supported")
-    endif()    
-endif()
+set(JGE_INCLUDE_DIRS include include/hge)
 
-if(platform_sdl)	
-	add_definitions(-DSDL_CONFIG)
-
-	if(operating_system_linux)
-        add_definitions(-DLINUX)
-		
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildSDL2()
-        FindOrBuildUNZIP()
-		FindOrBuildGIF()
-		FindOrBuildPNG()
-		FindOrBuildJPEG()
-        FindOrBuildBoost()
-		
-        include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${PNG_INCLUDE_DIRS} ${BOOST_INCLUDE_DIRS})
-		add_library(jge-sdl ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
-		target_link_libraries(jge-sdl ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${GIF_LIBRARIES} ${JPEG_LIBRARY} ${PNG_LIBRARIES})
-    elseif(operating_system_android)
-        add_definitions(-DANDROID -DLINUX)
-        
-        FindOrBuildTinyXML()
-        FindOrBuildZipFS()
-        FindOrBuildSDL2()
-        FindOrBuildUNZIP()
-        FindOrBuildPNG()
-        FindOrBuildJPEG()
-        FindOrBuildBoost()
-        find_package(OpenSL)
-        
-        include_directories(${BOOST_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} 
-                            ${UNZIP_INCLUDE_DIR} ${PNG_INCLUDE_DIRS} ${JPEG_INCLUDE_DIR} ${OPENSL_INCLUDE_DIR})
-        add_library(jge-sdl ${JGE_generic_src} ${JGE_android_src} ${JGE_graphics_src} ${JGE_hge_src})
-        target_link_libraries(jge-sdl ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${JPEG_LIBRARY} ${PNG_LIBRARIES} ${OPENSL_LIBRARIES}) 
-	elseif(operating_system_windows)
-        add_definitions(-DWIN32)
-		
-        FindOrBuildZipFS()
-		FindOrBuildTinyXML()
-		FindOrBuildSDL2()
-        FindOrBuildUNZIP()
-		FindOrBuildGIF()
-		FindOrBuildPNG()
-		FindOrBuildJPEG()
-		FindOrBuildBoost()
-		
-		link_directories(${Boost_LIBRARY_DIR} ${SDL2_LIBRARY_DIR})
-		include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR}
-							${GIF_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
-		add_library(jge-sdl ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
-		set_property(TARGET jge-sdl PROPERTY COMPILE_DEFINITIONS_DEBUG _CRT_SECURE_NO_WARNINGS)
-		target_link_libraries(jge-sdl ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${GIF_LIBRARIES} ${JPEG_LIBRARY} ${PNG_LIBRARIES})
+if(backend_qt_console)
+    if(UNIX)
+        set(JGE_INTERNAL_INCLUDE_DIRS ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+            ${UNZIP_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
+        set(JGE_SOURCES ${JGE_generic_src} ${JGE_console_src} ${JGE_linux_src} ${JGE_hge_src})
+        set(JGE_LINK_LIBRARIES ${QT_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${GIF_LIBRARIES} 
+            ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+    else()
+        message(FATAL_ERROR "qt builds of jge platforms other than linux are not supported")
     endif()
 endif()
 
-if(platform_psp)
-    add_definitions(-DPSP)
-    add_definitions(-D_PSP_FW_VERSION=371)
-    add_definitions(-DDEVHOOK -DPSPFW3XX)
-    
-	#this is a cross-compile. we do not specify -DLINUX
-	find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
-        
-	set(EXTRA_INCLUDES ${PSPSDK_PATH}/include)
-	set(TINYXML_FORCE_BUILD ON)
-	set(BOOST_FORCE_BUILD ON)
-        
-	FindOrBuildTinyXML()
-	FindOrBuildZipFS()
-	FindOrBuildUNZIP()
-	FindOrBuildGIF()
-	FindOrBuildBoost()
-        
-	#TODO: put in FIndPSPLIBS.cmake -script
-	include_directories(${CMAKE_SOURCE_DIR}/thirdparty/psp/include)
-	include_directories(${PSPSDK_PATH}/include)
-	include_directories(${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${GIF_INCLUDE_DIR})
-    
-	add_library(jge-psp ${JGE_generic_src} ${JGE_psp_src} ${JGE_hge_src})
-	target_link_libraries(jge-psp ${TINYXML_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY})
+if(backend_qt_widget)
+    if(UNIX)
+        set(JGE_INTERNAL_INCLUDE_DIRS ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+            ${UNZIP_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
+        set(JGE_SOURCES ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+        set(JGE_LINK_LIBRARIES ${QT_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} 
+            ${GIF_LIBRARIES} ${JPEG_LIBRARIES} ${PNG_LIBRARIES})
+    else()
+        message(FATAL_ERROR "qt builds of jge platforms other than linux are not supported")
+    endif()
 endif()
 
+if(backend_sdl)
+    if(UNIX)
+        set(JGE_INTERNAL_INCLUDE_DIRS ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR}   
+            ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${PNG_INCLUDE_DIRS} ${BOOST_INCLUDE_DIRS})
+        set(JGE_SOURCES ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+        set(JGE_LINK_LIBRARIES ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${GIF_LIBRARIES} ${JPEG_LIBRARY} 
+            ${PNG_LIBRARIES})
+    elseif(ANDROID)
+        set(JGE_INTERNAL_INCLUDE_DIRS ${BOOST_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR}     
+            ${SDL2_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${PNG_INCLUDE_DIRS} ${JPEG_INCLUDE_DIR} 
+            ${OPENSL_INCLUDE_DIR})
+        set(JGE_SOURCES ${JGE_generic_src} ${JGE_android_src} ${JGE_graphics_src} ${JGE_hge_src})
+        set(JGE_LINK_LIBRARIES ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${JPEG_LIBRARY} ${PNG_LIBRARIES} 
+            ${OPENSL_LIBRARIES}) 
+    elseif(WIN32)
+        set(JGE_INTERNAL_INCLUDE_DIRS ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${SDL2_INCLUDE_DIR} 
+            ${UNZIP_INCLUDE_DIR} ${GIF_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+        set(JGE_SOURCES ${JGE_generic_src} ${JGE_graphics_src} ${JGE_linux_src} ${JGE_hge_src})
+        set(JGE_LINK_LIBRARIES ${ZIPFS_LIBRARY} ${UNZIP_LIRARY} ${GIF_LIBRARIES} ${JPEG_LIBRARY} 
+            ${PNG_LIBRARIES})
+        set(JGE_LINK_DIRECTORIES ${Boost_LIBRARY_DIR} ${SDL2_LIBRARY_DIR})
+    endif()
+endif()
+
+if(backend_psp)
+    if(PSP)        
+        #${PSPSDK_PATH}/include should be in system pathes
+        set(JGE_INTERNAL_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/thirdparty/psp/include ${TINYXML_INCLUDE_DIR} 
+            ${ZIPFS_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${GIF_INCLUDE_DIR})
+        set(JGE_SOURCES ${JGE_generic_src} ${JGE_psp_src} ${JGE_hge_src})
+        set(JGE_LINK_LIBRARIES ${TINYXML_LIBRARIES} ${ZIPFS_LIBRARY} ${UNZIP_LIRARY})
+    else()
+        message(FATAL_ERROR "use the cross-compile toolchain to build as the psp target")
+    endif()
+endif()
+
+add_library(jge STATIC ${JGE_SOURCES})
+include_directories(${JGE_INTERNAL_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS})
+target_link_libraries(jge ${JGE_LINK_LIBRARIES})
+link_directories(${JGE_LINK_DIRECTORIES})
+
+set(${JGE_LIBRARIES} jge)
