@@ -139,7 +139,7 @@ if(backend_qt_console OR backend_qt_widget)
 endif()
 
 if(backend_qt_console)
-    if(UNIX)
+    if(UNIX AND NOT ANDROID)
         set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
             ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
         set(MTG_SOURCES ${MTG_generic_src} ${MTG_qt_console_src})
@@ -151,7 +151,7 @@ if(backend_qt_console)
 endif()
 
 if(backend_qt_widget)
-    if(UNIX)
+    if(UNIX AND NOT ANDROID)
         set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
             ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${QT_MKSPECS_DIR}/default)
         set(MTG_SOURCES ${MTG_generic_src} ${MTG_qt_graphic_src})
@@ -163,20 +163,21 @@ if(backend_qt_widget)
 endif()
 
 if(backend_sdl)
-    if(UNIX)
+    if(UNIX AND NOT ANDROID)
         set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
             ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
         set(MTG_SOURCES ${MTG_generic_src} ${MTG_sdl_src})
         set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
             ${Boost_LIBRARIES} ${HGE_LIBRARY})
     elseif(ANDROID)
-        set(MTG_INTERNAL_INCLUDE_DIRS ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} 
-            ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
+        set(MTG_INTERNAL_INCLUDE_DIRS ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
+            ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
         #we should try to get rid of this hack
         set(MTG_SOURCES ${MTG_generic_src} ${MTG_sdl_src}
                     ${ANDROID_BOOST_PTHREAD_SRC_DIR}/thread.cpp
                     ${ANDROID_BOOST_PTHREAD_SRC_DIR}/once.cpp
-                    ${ANDROID_BOOST_SYSTEM_SRC_DIR}/error_code.cpp)
+                    ${ANDROID_BOOST_SYSTEM_SRC_DIR}/error_code.cpp
+                    src/TestSuiteAI.cpp)
         set(MTG_LINK_LIBRARIES ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
             ${Boost_LIBRARIES} ${HGE_LIBRARY})
     elseif(WIN32)

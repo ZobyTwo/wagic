@@ -65,7 +65,7 @@ macro(FindOrBuildBoost)
             message("We need system thread and date_time compiled static libs")
             message("These libs are compiler specific.")
 		endif()
-    elseif(UNIX)
+    elseif(UNIX AND NOT ANDROID)
         find_package(Boost COMPONENTS system thread date_time REQUIRED)
     elseif(ANDROID)
         #this is a hack. we compile a few boost libds directly into 
