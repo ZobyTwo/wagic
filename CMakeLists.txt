@@ -22,7 +22,10 @@ if(DEFINED CMAKE_BUILD_TYPE)
   set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CMAKE_CONFIGURATION_TYPES} )
 endif()
 
+
 project(wagic CXX C)
+#todo: somehow determine wagics version
+set(WAGIC_VERSION "0.19")
 
 #add standard paths to search for libraries. borrowed from opencv
 if(UNIX AND NOT ANDROID)
@@ -91,6 +94,11 @@ WAGIC_OPTION(BUILD_PNG     "build png from source"     (WIN32 OR APPLE OR PSP OR
 WAGIC_OPTION(BUILD_UNZIP   "build unzip from source"   ON)
 WAGIC_OPTION(BUILD_TINYXML "build tinyxml from source" (WIN32 OR APPLE OR PSP OR ANDROID))
 WAGIC_OPTION(BUILD_ZIPFS   "build zipfs from source"   ON)
+
+#project options
+if(ANDROID)
+    WAGIC_OPTION(BUILD_ANDROID_PACKAGE "put the compiled code in an android package" ON)
+endif()
 
 #set output paths
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Application output directory")
@@ -168,3 +176,7 @@ endif()
 #add jge and mtg projects
 add_subdirectory(JGE)
 add_subdirectory(projects/mtg)
+
+if(BUILD_ANDROID_PACKAGE)
+  add_subdirectory(platforms/android/package)
+endif()
