@@ -17,7 +17,7 @@ install:
   - wget http://dl.google.com/android/ndk/android-ndk-r9-linux-x86_64.tar.bz2 -nv
   - wget http://dl.google.com/android/android-sdk_r22-linux.tgz -nv
   - wget http://libsdl.org/release/SDL2-2.0.1.tar.gz -nv
-  - wget http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.gz/download -nv
+  - wget -O boost_1_55_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.gz/download -nv
   - tar --absolute-names -jxf android-ndk-r9-linux-x86_64.tar.bz2
   - tar -zxf android-sdk_r22-linux.tgz
   - tar -zxf SDL2-2.0.1.tar.gz
