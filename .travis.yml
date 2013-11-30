@@ -1,8 +1,12 @@
 language: cpp
 before_install: 
   - sudo apt-get update -qq
+  - export PSPDEV="$TRAVIS_BUILD_DIR/opt/pspsdk"
+  - export PSPSDK="$PSPDEV/psp/sdk"
+  - export PATH="$PATH:$PSPDEV/bin:$PSPSDK/bin"
 install:
   - sudo apt-get install --force-yes libtinyxml-dev libjpeg-dev libpng-dev libgif-dev libz-dev libboost-system-dev libboost-thread-dev libboost-date-time-dev
-  - apt-cache search sdl
+  - wget -O sdk.lzma http://sourceforge.net/projects/minpspw/files/SDK%20%2B%20devpak/pspsdk%200.11.2/minpspw_0.11.2-amd64.tar.lzma/download
+  - tar -x --xz -f sdk.lzma
 script: "./travis-script.sh"
 after_success: ./upload-binaries.sh
