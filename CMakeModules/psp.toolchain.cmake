@@ -9,10 +9,11 @@ execute_process(COMMAND psp-config --pspsdk-path OUTPUT_VARIABLE PSPSDK_PATH OUT
 execute_process(COMMAND psp-config --psp-prefix  OUTPUT_VARIABLE PSPSDK_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
 	
 # specify compiler and linker:
-set(CMAKE_CXX_COMPILER_FORCED ON)
-find_program(CMAKE_CXX_COMPILER psp-g++)
-set(CMAKE_C_COMPILER_FORCED ON)
-find_program(CMAKE_C_COMPILER   psp-gcc)
+find_program(PSP_GPP psp-g++)
+find_program(PSP_GCC psp-gcc)
+
+CMAKE_FORCE_C_COMPILER(${PSP_GCC} GNU)
+CMAKE_FORCE_CXX_COMPILER(${PSP_GPP} GNU)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -G0")
 
