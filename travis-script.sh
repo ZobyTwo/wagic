@@ -30,11 +30,11 @@ make -j8
 cd ..
 
 #and an qt-widget build
-#mkdir build_qt_widget
-#cd build_qt_widget
-#cmake -Dbackend_qt_widget=ON -Dbackend_qt_console=OFF ..
-#make -j8
-#cd ..
+mkdir build_qt_widget
+cd build_qt_widget
+cmake -Dbackend_qt_widget=ON -Dbackend_qt_console=OFF ..
+make -j8
+cd ..
 
 # and finish by running the testsuite
 cd projects/mtg
