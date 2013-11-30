@@ -1,7 +1,7 @@
 language: cpp
 before_install:
-  - sudo apt-get update -qq
 install:
+  - sudo apt-get update -qq
   - sudo apt-get install --force-yes libtinyxml-dev libsdl2-dev libjpeg-dev libpng-dev libgif-dev libz-dev libboost-system-dev libboost-thread-dev libboost-date-time-dev
 script: "./travis-script.sh"
 after_success: ./upload-binaries.sh
