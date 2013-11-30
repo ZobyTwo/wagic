@@ -126,6 +126,10 @@ set(MTG_qt_console_src
         
 set(MTG_sdl_src
         src/SDLmain.cpp)
+        
+set(MTG_android_sdl_src
+        src/SDLmain.cpp
+        src/SDL_android_main.cpp)
 
 
 set(MTG_INCLUDE_DIRS include include/qt)
@@ -173,13 +177,13 @@ if(backend_sdl)
         include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
             ${BOOST_INCLUDE_DIRS} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR})
         #we should try to get rid of this hack
-        add_executable(wagic ${MTG_generic_src} ${MTG_sdl_src}
+        add_library(wagic SHARED ${MTG_generic_src} ${MTG_android_sdl_src}
                     ${ANDROID_BOOST_PTHREAD_SRC_DIR}/thread.cpp
                     ${ANDROID_BOOST_PTHREAD_SRC_DIR}/once.cpp
                     ${ANDROID_BOOST_SYSTEM_SRC_DIR}/error_code.cpp
                     src/TestSuiteAI.cpp)
         target_link_libraries(wagic  ${JGE_LIBRARY} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${TINYXML_LIBRARIES} 
-            ${Boost_LIBRARIES} ${HGE_LIBRARY})
+            ${HGE_LIBRARY})
     elseif(WIN32)
         include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
             ${Boost_INCLUDE_DIR} ${UNZIP_INCLUDE_DIR} ${HGE_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} 

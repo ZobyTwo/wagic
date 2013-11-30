@@ -36,3 +36,13 @@ macro(WAGIC_OPTION variable description value)
   unset(__condition)
   unset(__value)
 endmacro() 
+
+# add prefix to each item in the list
+macro(list_add_prefix LST PREFIX)
+  set(__tmp "")
+  foreach(item ${${LST}})
+    list(APPEND __tmp "${PREFIX}${item}")
+  endforeach()
+  set(${LST} ${__tmp})
+  unset(__tmp)
+endmacro()

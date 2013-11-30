@@ -102,6 +102,7 @@ if(ANDROID)
     WAGIC_OPTION(BUILD_ANDROID_PACKAGE "put the compiled code in an android package" ON)
 endif()
 
+
 if(ANDROID)
     set(LIBRARY_OUTPUT_PATH        "${CMAKE_BINARY_DIR}/lib/${ANDROID_NDK_ABI_NAME}")
     set(3P_LIBRARY_OUTPUT_PATH     "${CMAKE_BINARY_DIR}/3rdparty/lib/${ANDROID_NDK_ABI_NAME}")
@@ -109,6 +110,7 @@ if(ANDROID)
     set(WAGIC_3P_LIB_INSTALL_PATH  sdk/native/3rdparty/libs/${ANDROID_NDK_ABI_NAME})
     set(WAGIC_CONFIG_INSTALL_PATH  sdk/native/jni)
     set(WAGIC_INCLUDE_INSTALL_PATH sdk/native/jni/include)
+    set(EXECUTABLE_OUTPUT_PATH     "${CMAKE_BINARY_DIR}/package/bin")
 else()
     set(LIBRARY_OUTPUT_PATH        "${CMAKE_BINARY_DIR}/lib")
     set(3P_LIBRARY_OUTPUT_PATH     "${OpenCV_BINARY_DIR}/3rdparty/lib${LIB_SUFFIX}")
@@ -176,11 +178,17 @@ endif()
 if(backend_qt_console OR backend_qt_widget)
     FindOrBuildQt()
 endif()
+if(ANDROID)
+    include(DetectAndroidSDK)
+endif()
+
+#fix later
+include(FindAnt)
 
 #add jge and mtg projects
 add_subdirectory(JGE)
 add_subdirectory(projects/mtg)
 
-#if(BUILD_ANDROID_PACKAGE)
-#  add_subdirectory(platforms/android/package)
-#endif()
+if(BUILD_ANDROID_PACKAGE)
+  add_subdirectory(platforms/android/package)
+endif()

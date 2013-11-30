@@ -3,7 +3,7 @@
 #this does not work currenly as travic has no sdl2 installable
 #mkdir build_sdl
 #cd build_sdl
-#cmake -Dbackend_sdl=ON -Dbackend_qt_console=OFF ..
+#cmake -DCMAKE_TOOLCHAIN_FILE=../CMakeModules/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=android-13 .. #android-10 is better but i dont have that api installed atm
 #make -j8
 #cd ..
 
