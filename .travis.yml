@@ -1,8 +1,8 @@
 language: cpp
 before_install: 
-  - uname -a
-install:
   - sudo apt-get update -qq
-  - sudo apt-get install --force-yes libtinyxml-dev libjpeg-dev libpng-dev libgif-dev libz-dev libboost-system-dev libboost-thread-dev libboost-date-time-dev libsdl-dev
+install:
+  - sudo apt-get install --force-yes libtinyxml-dev libjpeg-dev libpng-dev libgif-dev libz-dev libboost-system-dev libboost-thread-dev libboost-date-time-dev
+  - apt-cache search sdl
 script: "./travis-script.sh"
 after_success: ./upload-binaries.sh
