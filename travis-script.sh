@@ -1,11 +1,11 @@
 #!/bin/sh -ex
 
 # let's also try the sdl binary
-mkdir build_sdl
-cd build_sdl
-cmake -Dbackend_sdl=ON -Dbackend_qt_console=OFF ..
-make -j8
-cd ..
+#mkdir build_sdl
+#cd build_sdl
+#cmake -Dbackend_sdl=ON -Dbackend_qt_console=OFF ..
+#make -j8
+#cd ..
 
 # we're building a Qt version with GUI here
 mkdir qt-gui-build
