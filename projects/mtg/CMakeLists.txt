@@ -197,8 +197,8 @@ if(backend_psp)
         include_directories(${MTG_INCLUDE_DIRS} ${JGE_INCLUDE_DIRS} ${TINYXML_INCLUDE_DIR} ${ZIPFS_INCLUDE_DIR} 
             ${UNZIP_INCLUDE_DIR} ${BOOST_INCLUDE_DIRS} ${GIF_INCLUDE_DIR} ${HGETOOLS_INCLUDE_DIRS})
         add_executable(wagic ${MTG_generic_src})
-        target_link_libraries(wagic ${JGE_LIBRARY} ${HGETOOLS_LIBRARY} ${FREETYPE_LIB} ${JPEG_LIBRARY} 
-            ${GIF_LIBRARIES} ${PNG_LIBRARIES} z m ${MIKMOD_LIBRARY} ${PSPSDK_LIB} ${TINYXML_LIBRARIES} 
+        target_link_libraries(wagic ${JGE_LIBRARY} ${PSPSDK_LIB} ${HGETOOLS_LIBRARY} ${FREETYPE_LIB} ${JPEG_LIBRARY} 
+            ${GIF_LIBRARIES} ${PNG_LIBRARIES} z m ${MIKMOD_LIBRARY} ${TINYXML_LIBRARIES} 
             stdc++ ${PSPSDK_REQUIRED_LIB})
 
         set(PRXSPECS_FILE "${PSPSDK_PATH}/lib/prxspecs")
