@@ -12,11 +12,11 @@ ant update > error.txt
 cd ../..
 
 # we're building a PSP binary here
-mkdir build_psp
-cd build_psp
-cmake -DCMAKE_TOOLCHAIN_FILE=../CMakeModules/psp.toolchain.cmake ..
-make -j8
-cd ..
+#mkdir build_psp
+#cd build_psp
+#cmake -DCMAKE_TOOLCHAIN_FILE=../CMakeModules/psp.toolchain.cmake ..
+#make -j8
+#cd ..
 
 # we're building an Android binary here
 #android-ndk-r9/ndk-build -C projects/mtg/Android -j8
@@ -25,11 +25,11 @@ cd ..
 #ant debug -f projects/mtg/Android/build.xml
 
 #this mimics the first build step of the android-ndk thingy
-mkdir build_android
-cd build_android
-cmake -DCMAKE_TOOLCHAIN_FILE=../CMakeModules/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=android-13 .. 
-make -j8
-cd ..
+#mkdir build_android
+#cd build_android
+#cmake -DCMAKE_TOOLCHAIN_FILE=../CMakeModules/android.toolchain.cmake -DANDROID_NATIVE_API_LEVEL=android-13 .. 
+#make -j8
+#cd ..
 
 # let's also try the sdl binary
 mkdir build_sdl
