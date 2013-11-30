@@ -1,27 +1,8 @@
 language: cpp
 before_install:
-  - export PSPDEV="$TRAVIS_BUILD_DIR/opt/pspsdk"
-  - export PSPSDK="$PSPDEV/psp/sdk"
-  - export PATH="$PATH:$PSPDEV/bin:$PSPSDK/bin"
-  - export ANDROID="android-sdk-linux/tools/android"
-  - export ANDROID_SDK=android-sdk-linux
-  - export ANDROID_NDK=android-ndk-r9-linux-x86_64
-  - export ANDROID_SDL2_ROOT=SDL2
-  - export ANDROID_BOOST_ROOT=boost_1_55_0/boost
-  - export SDL2_ROOT=SDL2
+  - sudo apt-get update
 install:
   - sudo apt-get update -qq
-  - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch; fi
-  - wget -O sdk.lzma http://sourceforge.net/projects/minpspw/files/SDK%20%2B%20devpak/pspsdk%200.11.2/minpspw_0.11.2-amd64.tar.lzma/download
-  - tar -x --xz -f sdk.lzma
-  - wget http://dl.google.com/android/ndk/android-ndk-r9-linux-x86_64.tar.bz2 -nv
-  - wget http://dl.google.com/android/android-sdk_r22-linux.tgz -nv
-  - wget http://libsdl.org/release/SDL2-2.0.1.tar.gz -nv
-  - wget -O boost_1_55_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.gz/download -nv
-  - tar --absolute-names -jxf android-ndk-r9-linux-x86_64.tar.bz2
-  - tar -zxf android-sdk_r22-linux.tgz
-  - tar -zxf SDL2-2.0.1.tar.gz
-  - tar -zxf boost_1_55_0.tar.gz
-  - echo yes | $ANDROID update sdk --filter 1,2,3,8 --no-ui --force > log.txt
+  - sudo apt-get install -qq --force-yes libtinyxml-dev libsdl2-dev libjpeg-dev libpng-dev libgif-dev libz-dev libboost-system-dev libboost-thread-dev libboost-date-time-dev
 script: "./travis-script.sh"
 after_success: ./upload-binaries.sh

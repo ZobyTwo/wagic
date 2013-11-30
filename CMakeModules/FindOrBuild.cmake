@@ -26,11 +26,11 @@ endmacro()
 macro(FindOrBuildSDL2)
     if(ANDROID)
         set(ENV{SDL2DIR} "$ENV{ANDROID_SDL2_ROOT};$ENV{ANDROID_SDL2_ROOT}/libs/${ANDROID_NDK_ABI_NAME}/")
-        find_package(SDL2)
-    else()
-        set(ENV{SDL2DIR} $ENV{SDL2_ROOT})
-        find_package(SDL2)
-	endif()
+    elseif(WIN32)
+        set(ENV{SDL2DIR} $ENV{WIN_SDL2_ROOT})
+    endif()
+
+    find_package(SDL2)
 endmacro()
 
 macro(FindOrBuildUNZIP)
@@ -47,16 +47,16 @@ endmacro()
 
 macro(FindOrBuildBoost)
     if(PSP)
-		#the psp build does not need more than a few headers
-		#todo: remove from the repository
-		set(BOOST_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/thirdparty)    
-	elseif(WIN32)
+        #the psp build does not need more than a few headers
+        #todo: remove from the repository
+        set(BOOST_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/thirdparty)    
+    elseif(WIN32)
         #set BOOST_ROOT to the root of boost
         set(Boost_USE_STATIC_LIBS ON)
         set(Boost_USE_MULTITHREADED ON)
         set(BOOST_ROOT $ENV{BOOST_ROOT})
 		
-		set(BOOST_LIBRARYDIR ${BOOST_ROOT}/libs)
+        set(BOOST_LIBRARYDIR ${BOOST_ROOT}/libs)
         set(BOOST_INCLUDEDIR ${BOOST_ROOT})
         
 		find_package(Boost COMPONENTS system thread date_time REQUIRED)
@@ -211,3 +211,4 @@ endmacro()
 macro(FindOrBuildPSPSDK)
     find_package(PSPSDK COMPONENTS psppower pspmpeg pspaudiocodec pspaudiolib pspaudio pspmp3 pspgum pspgu psprtc pspfpu REQUIRED)
 endmacro()
+
