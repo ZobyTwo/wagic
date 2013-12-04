@@ -182,8 +182,9 @@ if(ANDROID)
     include(DetectAndroidSDK)
 endif()
 
-#fix later
-include(FindAnt)
+if(BUILD_ANDROID_PACKAGE)
+    find_package(Ant REQUIRED)
+endif()
 
 #add jge and mtg projects
 add_subdirectory(JGE)

@@ -46,3 +46,12 @@ macro(list_add_prefix LST PREFIX)
   set(${LST} ${__tmp})
   unset(__tmp)
 endmacro()
+
+
+macro(find_host_program)
+    set(_find_program ${CMAKE_FIND_ROOT_PATH_MODE_PROGRAM})
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+    find_program(${ARGN})
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ${_find_program})
+    unset(_find_program)
+endmacro()
